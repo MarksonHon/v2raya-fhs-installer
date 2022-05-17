@@ -14,7 +14,11 @@ DownloadUrl(){
 }
 
 CheckCurrentVersion(){
+    if [ ! -f /usr/local/bin/v2raya ]; then
+    CurrentVersion="none"
+    else
     CurrentVersion=$(/usr/local/bin/v2raya --version)
+    fi
     echo "Current Version is $CurrentVersion"
 }
 
@@ -53,21 +57,33 @@ GetSystemInformation(){
 
 v2rayAInstallation(){
     if [ $SystemArch == x86_64 ];then
-    curl -L $DownloadUrlx64 -output "/usr/local/bin/v2raya"
+    curl -L $DownloadUrlx64 -o "/usr/local/bin/v2raya"
     fi
     if [ $SystemArch == aarch64 ];then
-    curl -l $DownloadUrlarm64 -output "/usr/local/bin/v2raya"
+    curl -l $DownloadUrlarm64 -o "/usr/local/bin/v2raya"
     fi
 }
 
 main(){
     CheckCurrentVersion
     CheckLatestVersion
-    GetSystemInformation
-    DownloadUrl
-    v2rayAInstallation
-    MakeSystemDService
-    MakeSystemDServiceOverridesFolder
+    if [ $CurrentVersion != $LatestVersion ];then
+        GetSystemInformation
+        DownloadUrl
+        v2rayAInstallation
+        chmod +555 /usr/local/bin/v2raya
+        echo "v2rayA new version installed, use systemctl to start, stop or restart it."
+        systemctl daemon-reload
+        else
+        echo "There is no update for v2rayA, you have latest version."
+    fi
+    if [ ! -f /etc/systemd/system/v2raya.service ];then
+        echo "Making systemd service file..."
+        echo "Making '/etc/systemd/system/v2raya.service'"
+        MakeSystemDService
+        echo "Marking '/etc/systemd/system/v2raya.service.d/'"
+        MakeSystemDServiceOverridesFolder
+    fi
 }
 
 main "$@"

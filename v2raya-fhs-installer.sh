@@ -71,7 +71,7 @@ main(){
         GetSystemInformation
         DownloadUrl
         v2rayAInstallation
-        chmod +555 /usr/local/bin/v2raya
+        chmod 555 /usr/local/bin/v2raya
         echo "v2rayA new version installed, use systemctl to start, stop or restart it."
         systemctl daemon-reload
         else

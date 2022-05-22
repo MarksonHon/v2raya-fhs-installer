@@ -44,12 +44,6 @@ Restart=on-failure
 WantedBy=multi-user.target" > /etc/systemd/system/v2raya.service
 }
 
-MakeSystemDServiceOverridesFolder(){
-    if [ ! -d "/etc/systemd/system/v2raya.service.d/" ]; then
-      mkdir -p /etc/systemd/system/v2raya.service.d/
-    fi
-}
-
 GetSystemInformation(){
     SystemType=$(uname)
     SystemArch=$(uname -m)
@@ -57,11 +51,16 @@ GetSystemInformation(){
 
 v2rayAInstallation(){
     if [ $SystemArch == x86_64 ];then
-    curl -L $DownloadUrlx64 -o "/usr/local/bin/v2raya"
+    curl -L $DownloadUrlx64 -o "/tmp/v2raya"
     fi
     if [ $SystemArch == aarch64 ];then
-    curl -l $DownloadUrlarm64 -o "/usr/local/bin/v2raya"
+    curl -L $DownloadUrlarm64 -o "/tmp/v2raya"
     fi
+    if [[ -n $(ps -ef | grep v2raya | gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ') ]];then
+    kill -15 $(pidof v2raya)
+    fi
+    mv /tmp/v2raya /usr/local/bin/v2raya
+    chmod 555 /usr/local/bin/v2raya
 }
 
 main(){
@@ -71,18 +70,16 @@ main(){
         GetSystemInformation
         DownloadUrl
         v2rayAInstallation
-        chmod 555 /usr/local/bin/v2raya
         echo "v2rayA new version installed, use systemctl to start, stop or restart it."
-        systemctl daemon-reload
         else
         echo "There is no update for v2rayA, you have latest version."
     fi
     if [ ! -f /etc/systemd/system/v2raya.service ];then
-        echo "Making systemd service file..."
         echo "Making '/etc/systemd/system/v2raya.service'"
         MakeSystemDService
+    if [ ! -d "/etc/systemd/system/v2raya.service.d/" ]; then
         echo "Marking '/etc/systemd/system/v2raya.service.d/'"
-        MakeSystemDServiceOverridesFolder
+        mkdir -p /etc/systemd/system/v2raya.service.d/
     fi
 }
 

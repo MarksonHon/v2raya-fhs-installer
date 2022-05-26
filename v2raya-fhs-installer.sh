@@ -77,6 +77,7 @@ main(){
     if [ ! -f /etc/systemd/system/v2raya.service ];then
         echo "Making '/etc/systemd/system/v2raya.service'"
         MakeSystemDService
+    fi    
     if [ ! -d "/etc/systemd/system/v2raya.service.d/" ]; then
         echo "Marking '/etc/systemd/system/v2raya.service.d/'"
         mkdir -p /etc/systemd/system/v2raya.service.d/

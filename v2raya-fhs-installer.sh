@@ -56,6 +56,10 @@ v2rayAInstallation(){
     if [ $SystemArch == aarch64 ];then
     curl -L $DownloadUrlarm64 -o "/tmp/v2raya"
     fi
+    if [ -f /etc/systemd/system/v2raya.service ];then
+    echo "Stopping v2raya"
+    systemctl stop v2raya
+    fi
     if [[ -n $(ps -ef | grep v2raya | gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ') ]];then
     kill -15 $(pidof v2raya)
     fi
@@ -71,6 +75,7 @@ main(){
         DownloadUrl
         v2rayAInstallation
         echo "v2rayA new version installed, use systemctl to start, stop or restart it."
+        echo " use \"systemctl enable v2raya\" to make v2rayA start at system startup."
         else
         echo "There is no update for v2rayA, you have latest version."
     fi
@@ -82,6 +87,8 @@ main(){
         echo "Marking '/etc/systemd/system/v2raya.service.d/'"
         mkdir -p /etc/systemd/system/v2raya.service.d/
     fi
+    echo "Starting v2raya"
+    systemctl start v2raya
 }
 
 main "$@"

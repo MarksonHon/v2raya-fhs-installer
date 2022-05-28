@@ -59,6 +59,7 @@ v2rayAInstallation(){
     if [ -f /etc/systemd/system/v2raya.service ];then
     echo "Stopping v2raya"
     systemctl stop v2raya
+    v2rayAServiceStopped=true
     fi
     if [[ -n $(ps -ef | grep v2raya | gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ') ]];then
     kill -15 $(pidof v2raya)
@@ -87,8 +88,10 @@ main(){
         echo "Marking '/etc/systemd/system/v2raya.service.d/'"
         mkdir -p /etc/systemd/system/v2raya.service.d/
     fi
+    if [ v2rayAServiceStopped == "true" ]; then
     echo "Starting v2raya"
     systemctl start v2raya
+    fi
 }
 
 main "$@"

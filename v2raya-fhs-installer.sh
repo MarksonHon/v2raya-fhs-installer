@@ -88,7 +88,7 @@ main(){
         echo "Marking '/etc/systemd/system/v2raya.service.d/'"
         mkdir -p /etc/systemd/system/v2raya.service.d/
     fi
-    if [ v2rayAServiceStopped == "true" ]; then
+    if [ $v2rayAServiceStopped == "true" ]; then
     echo "Starting v2raya"
     systemctl start v2raya
     fi

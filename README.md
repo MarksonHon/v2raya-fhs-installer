@@ -35,7 +35,7 @@ Restart=on-failure
 WantedBy=multi-user.target
 ```
 
-## OpenRC Service
+### OpenRC Service
 
 This service script locales `/etc/init.d/v2raya`:
 

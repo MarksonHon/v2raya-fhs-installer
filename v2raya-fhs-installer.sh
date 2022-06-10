@@ -138,11 +138,12 @@ InstallService(){
     chmod +x /etc/init.d/v2raya
     echo "If you want to start v2rayA at system startup, please run:"
     echo "rc-update add v2raya"
-    fi
-    if [ -f /usr/lib/systemd/systemd ]; then
+    elif [ -f /usr/lib/systemd/systemd ]; then
     MakeSystemDService
     echo "If you want to start v2rayA at system startup, please run:"
     echo "systemctl enable v2raya"
+    else
+    echo "No supported init system found, no service would be installed!"
     fi
 }
 

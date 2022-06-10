@@ -60,7 +60,7 @@ MakeOpenRCService(){
     if [ ! -f /etc/init.d/v2raya ]; then
     echo "Making /etc/init.d/v2raya"
     echo "
-#/sbin/openrc-run
+#! /sbin/openrc-run
 
 name=\"v2rayA\"
 description=\"A Linux web GUI client of Project V which supports V2Ray, Xray, SS, SSR, Trojan and Pingtunnel\"

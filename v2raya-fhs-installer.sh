@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"
 GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
@@ -59,7 +59,7 @@ fi
 MakeOpenRCService(){
     if [ ! -f /etc/init.d/v2raya ]; then
     echo "
-#\!/sbin/openrc-run
+#/sbin/openrc-run
 
 name=\"v2rayA\"
 description=\"A Linux web GUI client of Project V which supports V2Ray, Xray, SS, SSR, Trojan and Pingtunnel\"

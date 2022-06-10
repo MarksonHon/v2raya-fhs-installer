@@ -110,11 +110,11 @@ chmod 755 /etc/runit/sv/v2raya/run
 
 ## Thanks to
 
-1. V2Ray Systemd Installation Script
+1. V2Ray Systemd Installation Script  
 <https://github.com/v2fly/fhs-install-v2ray/blob/master/install-release.sh>
 
-2. V2Ray Alpine Installation Script
+2. V2Ray Alpine Installation Script  
 <https://github.com/v2fly/alpinelinux-install-v2ray/blob/master/install-release.sh>
 
-3. Void Linux Wiki
+3. Void Linux Wiki  
 <https://docs.voidlinux.org/config/services/index.html>

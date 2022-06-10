@@ -29,9 +29,8 @@ CheckCurrentVersion(){
 MakeSystemDService(){
     if [ ! -f /etc/systemd/system/v2raya.service ]; then
     echo "Making '/etc/systemd/system/v2raya.service'"
-    echo "
-[Unit]
-Description=v2rayA Service
+    echo "[Unit]
+Description=A Linux web GUI client of Project V which supports V2Ray, Xray, SS, SSR, Trojan and Pingtunnel
 Documentation=https://v2raya.org
 After=network.target nss-lookup.target iptables.service ip6tables.service
 Wants=network.target
@@ -59,7 +58,7 @@ fi
 MakeOpenRCService(){
     if [ ! -f /etc/init.d/v2raya ]; then
     echo "Making /etc/init.d/v2raya"
-    echo "#! /sbin/openrc-run
+    echo "#!/sbin/openrc-run
 
 name=\"v2rayA\"
 description=\"A Linux web GUI client of Project V which supports V2Ray, Xray, SS, SSR, Trojan and Pingtunnel\"

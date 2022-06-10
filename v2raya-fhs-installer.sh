@@ -128,6 +128,7 @@ StartService(){
     fi
     if [ v2rayAServiceStopped == 1 && -f /etc/init.d/v2raya ]; then
     rc-service v2raya start
+    fi
 }
 
 InstallService(){

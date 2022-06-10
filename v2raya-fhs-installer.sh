@@ -87,7 +87,6 @@ start_pre() {
    ln -s \"/tmp/v2raya/\" \"/var/log/\"
    fi
 }" > '/etc/init.d/v2raya'
-    chmod +x /etc/init.d/v2raya
 fi
 }
 
@@ -137,6 +136,7 @@ StartService(){
 InstallService(){
     if [ -f /sbin/openrc-run ]; then
     MakeOpenRCService
+    chmod +x /etc/init.d/v2raya
     echo "If you want to start v2rayA at system startup, please run:"
     echo "rc-update add v2raya"
     fi

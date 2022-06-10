@@ -68,7 +68,7 @@ description=\"A Linux web GUI client of Project V which supports V2Ray, Xray, SS
 command=\"/usr/local/bin/v2raya\"
 command_args=\"--log-file /var/log/v2raya/access.log\"
 error_log=\"/var/log/v2raya/error.log\"
-pidfile=\"/run/${RC_SVCNAME}.pid\"
+pidfile=\"/run/\${RC_SVCNAME}.pid\"
 command_background=\"yes\"
 rc_ulimit=\"-n 30000\"
 rc_cgroup_cleanup=\"yes\"
@@ -99,10 +99,10 @@ GetSystemInformation(){
 #6. Download v2rayA
 Download_v2rayA(){
     if [ $SystemArch == x86_64 ];then
-    curl -L $DownloadUrlx64 -o "/tmp/v2raya"
+    curl -L $DownloadUrlx64 -o "/tmp/v2raya_temp"
     fi
     if [ $SystemArch == aarch64 ];then
-    curl -L $DownloadUrlarm64 -o "/tmp/v2raya"
+    curl -L $DownloadUrlarm64 -o "/tmp/v2raya_temp"
     fi
     if [ $SystemArch != x86_64 ] && [ $SystemArch != aarch64 ];then
     echo "You have an unsupported system architecture, script will exit now!"
@@ -155,8 +155,9 @@ main(){
     GetUrl
     Download_v2rayA
     StopService
-    cp "/tmp/v2raya" "/usr/local/bin/v2raya"
+    cp "/tmp/v2raya_temp" "/usr/local/bin/v2raya"
     chmod 755 "/usr/local/bin/v2raya"
+    rm "/tmp/v2raya_temp"
     InstallService
     StartService
     fi

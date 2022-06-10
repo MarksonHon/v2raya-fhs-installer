@@ -58,6 +58,7 @@ fi
 #4-2 Make OpenRC Service
 MakeOpenRCService(){
     if [ ! -f /etc/init.d/v2raya ]; then
+    echo "Making /etc/init.d/v2raya"
     echo "
 #/sbin/openrc-run
 
@@ -86,6 +87,7 @@ start_pre() {
    ln -s \"/tmp/v2raya/\" \"/var/log/\"
    fi
 }" > '/etc/init.d/v2raya'
+    chmod +x /etc/init.d/v2raya
 fi
 }
 
@@ -123,10 +125,10 @@ StopService(){
 }
 
 StartService(){
-    if [ v2rayAServiceStopped == 1 && -f /etc/systemd/system/v2raya.service ];then
+    if [ v2rayAServiceStopped == 1] && [ -f /etc/systemd/system/v2raya.service ];then
     systemctl start v2raya
     fi
-    if [ v2rayAServiceStopped == 1 && -f /etc/init.d/v2raya ]; then
+    if [ v2rayAServiceStopped == 1] && [ -f /etc/init.d/v2raya ]; then
     rc-service v2raya start
     fi
 }
@@ -153,6 +155,7 @@ main(){
     Download_v2rayA
     StopService
     cp "/tmp/v2raya" "/usr/local/bin/v2raya"
+    chmod 755 "/usr/local/bin/v2raya"
     InstallService
     StartService
     fi

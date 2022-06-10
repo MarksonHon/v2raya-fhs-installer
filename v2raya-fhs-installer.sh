@@ -112,7 +112,7 @@ Download_v2rayA(){
 }
 
 StopService(){
-    $PID_of_v2rayA=$(pidof v2raya)
+    PID_of_v2rayA=$(pidof v2raya)
     if [ -f /etc/systemd/system/v2raya.service ] && [ ! -n "$PID_of_v2ray"];then
     echo "Stopping v2raya"
     systemctl stop v2raya

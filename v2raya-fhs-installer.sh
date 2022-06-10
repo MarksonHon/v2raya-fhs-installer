@@ -105,30 +105,31 @@ Download_v2rayA(){
     if [ $SystemArch == aarch64 ];then
     curl -L $DownloadUrlarm64 -o "/tmp/v2raya"
     fi
-    if [ $SystemArch != x86_64 && $SystemArch != aarch64 ];then
+    if [ $SystemArch != x86_64 ] && [ $SystemArch != aarch64 ];then
     echo "You have an unsupported system architecture, script will exit now!"
     exit 9
     fi
 }
 
 StopService(){
-    if [ -f /etc/systemd/system/v2raya.service ];then
+    $PID_of_v2rayA=$(pidof v2raya)
+    if [ -f /etc/systemd/system/v2raya.service ] && [ ! -n "$PID_of_v2ray"];then
     echo "Stopping v2raya"
     systemctl stop v2raya
     v2rayAServiceStopped=1
     fi
-    if [ -f /etc/init.d/v2raya ]; then
+    if [ -f /etc/init.d/v2raya ] && [ ! -n "$PID_of_v2ray"]; then
     echo "Stopping v2raya"
-    rc-service stop v2raya
+    rc-service v2raya stop
     v2rayAServiceStopped=1
     fi
 }
 
 StartService(){
-    if [ v2rayAServiceStopped == 1] && [ -f /etc/systemd/system/v2raya.service ];then
+    if [ v2rayAServiceStopped == 1 ] && [ -f /etc/systemd/system/v2raya.service ];then
     systemctl start v2raya
     fi
-    if [ v2rayAServiceStopped == 1] && [ -f /etc/init.d/v2raya ]; then
+    if [ v2rayAServiceStopped == 1 ] && [ -f /etc/init.d/v2raya ]; then
     rc-service v2raya start
     fi
 }

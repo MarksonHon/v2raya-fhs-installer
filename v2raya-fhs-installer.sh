@@ -99,6 +99,7 @@ GetSystemInformation(){
     echo "If you are using Windows, please visit:"
     echo "https://github.com/v2rayA/v2raya-scoop"
     exit 9
+    fi
 }
 
 #6. Download v2rayA

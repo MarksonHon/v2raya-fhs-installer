@@ -92,6 +92,13 @@ fi
 GetSystemInformation(){
     SystemType=$(uname)
     SystemArch=$(uname -m)
+    if [ $SystemType != Linux ];then
+    echo "This bash script is only for Linux which follows FHS stand,"
+    echo "If you are using macOS, please visit:"
+    echo "https://github.com/v2rayA/homebrew-v2raya"
+    echo "If you are using Windows, please visit:"
+    echo "https://github.com/v2rayA/v2raya-scoop"
+    exit 9
 }
 
 #6. Download v2rayA
@@ -104,6 +111,7 @@ Download_v2rayA(){
     fi
     if [ $SystemArch != x86_64 ] && [ $SystemArch != aarch64 ];then
     echo "You have an unsupported system architecture, script will exit now!"
+    echo "You can build v2rayA with yourself."
     exit 9
     fi
 }
@@ -123,10 +131,10 @@ StopService(){
 }
 
 StartService(){
-    if [ v2rayAServiceStopped == 1 ] && [ -f /etc/systemd/system/v2raya.service ];then
+    if [ $v2rayAServiceStopped == 1 ] && [ -f /etc/systemd/system/v2raya.service ];then
     systemctl start v2raya
     fi
-    if [ v2rayAServiceStopped == 1 ] && [ -f /etc/init.d/v2raya ]; then
+    if [ $v2rayAServiceStopped == 1 ] && [ -f /etc/init.d/v2raya ]; then
     rc-service v2raya start
     fi
 }
@@ -142,7 +150,8 @@ InstallService(){
     echo "If you want to start v2rayA at system startup, please run:"
     echo "systemctl enable v2raya"
     else
-    echo "No supported init system found, no service would be installed!"
+    echo "No supported init system found, no service would be installed."
+    echo "However, v2rayA itself will be installed."
     fi
 }
 
@@ -159,6 +168,8 @@ main(){
     rm "/tmp/v2raya_temp"
     InstallService
     StartService
+    else
+    echo "No update available, script exits."
     fi
 }
 

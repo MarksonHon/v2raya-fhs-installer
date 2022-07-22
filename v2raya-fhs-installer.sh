@@ -157,10 +157,10 @@ InstallService(){
 }
 
 main(){
+    GetSystemInformation
     CheckCurrentVersion
     CheckLatestVersion
     if [ $CurrentVersion != $LatestVersion ];then
-    GetSystemInformation
     GetUrl
     Download_v2rayA
     StopService

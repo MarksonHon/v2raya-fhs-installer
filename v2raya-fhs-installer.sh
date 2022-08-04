@@ -5,7 +5,7 @@ GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
 
 #1. Check Latest Version
 CheckLatestVersion(){
-    LatestVersion=$(curl -s $GitHub_API_URL | jq '.tag_name' | cut -d '"' -f2 | cut -b 2-10)
+    LatestVersion=$(curl -s $GitHub_API_URL | jq '.tag_name' | cut -d '"' -f2 | cut -b 2-16)
     echo "Latest Version is $LatestVersion"
 }
 
@@ -93,6 +93,7 @@ GetSystemInformation(){
     SystemType=$(uname)
     SystemArch=$(uname -m)
     if [ $SystemType != Linux ];then
+    echo -e "\033[41;37m No supported system found! \033[0m"
     echo "This bash script is only for Linux which follows FHS stand,"
     echo "If you are using macOS, please visit:"
     echo "https://github.com/v2rayA/homebrew-v2raya"
@@ -105,10 +106,12 @@ GetSystemInformation(){
 #6. Download v2rayA
 Download_v2rayA(){
     if [ $SystemArch == x86_64 ];then
-    curl -L $DownloadUrlx64 -o "/tmp/v2raya_temp"
+    echo -e "\033[5;37m Downloading v2rayA... \033[0m"
+    curl -Ls $DownloadUrlx64 -o "/tmp/v2raya_temp"
     fi
     if [ $SystemArch == aarch64 ];then
-    curl -L $DownloadUrlarm64 -o "/tmp/v2raya_temp"
+    echo -e "\033[5;37m Downloading v2rayA... \033[0m"
+    curl -Ls $DownloadUrlarm64 -o "/tmp/v2raya_temp"
     fi
     if [ $SystemArch != x86_64 ] && [ $SystemArch != aarch64 ];then
     echo "You have an unsupported system architecture, script will exit now!"
@@ -123,11 +126,12 @@ StopService(){
     echo "Stopping v2raya"
     systemctl stop v2raya
     v2rayAServiceStopped=1
-    fi
-    if [ -f /etc/init.d/v2raya ] && [ ! -n "$PID_of_v2ray"]; then
+    elif [ -f /etc/init.d/v2raya ] && [ ! -n "$PID_of_v2ray"]; then
     echo "Stopping v2raya"
     rc-service v2raya stop
     v2rayAServiceStopped=1
+    else
+    v2rayAServiceStopped=0
     fi
 }
 

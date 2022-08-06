@@ -2,20 +2,18 @@
 
 GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"
 GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
+OSDN_Mirror_URL="https://zh.osdn.net/projects/v2raya/storage/releases"
 
-#1. Check Latest Version
 CheckLatestVersion(){
     LatestVersion=$(curl -s $GitHub_API_URL | jq '.tag_name' | cut -d '"' -f2 | cut -b 2-16)
     echo "Latest Version is $LatestVersion"
 }
 
-#2. GetUrl
 GetUrl(){
-    DownloadUrlx64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
-    DownloadUrlarm64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
+    DownloadUrlx64="$OSDN_Mirror_URL/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
+    DownloadUrlarm64="$OSDN_Mirror_URL/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
 }
 
-#3. Check Current Version
 CheckCurrentVersion(){
     if [ ! -f /usr/local/bin/v2raya ]; then
     CurrentVersion="none"
@@ -25,7 +23,6 @@ CheckCurrentVersion(){
     echo "Current Version is $CurrentVersion"
 }
 
-#4-1 Make SystemD Service
 MakeSystemDService(){
     if [ ! -f /etc/systemd/system/v2raya.service ]; then
     echo "Making '/etc/systemd/system/v2raya.service'"
@@ -54,7 +51,6 @@ if [ ! -d "/etc/systemd/system/v2raya.service.d/" ]; then
 fi
 }
 
-#4-2 Make OpenRC Service
 MakeOpenRCService(){
     if [ ! -f /etc/init.d/v2raya ]; then
     echo "Making /etc/init.d/v2raya"
@@ -88,7 +84,6 @@ start_pre() {
 fi
 }
 
-#5. Get System Information
 GetSystemInformation(){
     SystemType=$(uname)
     SystemArch=$(uname -m)
@@ -103,31 +98,42 @@ GetSystemInformation(){
     fi
 }
 
-#6. Download v2rayA
 Download_v2rayA(){
     if [ $SystemArch == x86_64 ];then
-    echo -e "\033[5;37m Downloading v2rayA... \033[0m"
+    echo -e "\033[42;37m Downloading v2rayA... \033[0m"
     curl -Ls $DownloadUrlx64 -o "/tmp/v2raya_temp"
+    Sha256_x64_local=$(sha256sum "/tmp/v2raya_temp" | cut -d ' ' -f1)
+    Sha256_x64_Online=$(curl -sL https://zh.osdn.net/projects/v2raya/storage/releases/v$LatestVersion/info.json | grep "v2raya_linux_x64_$LatestVersion" |  cut -d '"' -f4)
+        if [ $Sha256_x64_local != $Sha256_x64_Online ]; then
+        echo -e "\033[41;37m Error: Sha256 NOT match! Please check your network and try again. \033[0m"
+        exit 1
+        fi
     fi
     if [ $SystemArch == aarch64 ];then
-    echo -e "\033[5;37m Downloading v2rayA... \033[0m"
+    echo -e "\033[42;37m Downloading v2rayA... \033[0m"
     curl -Ls $DownloadUrlarm64 -o "/tmp/v2raya_temp"
+    Sha256_arm64_local=$(sha256sum "/tmp/v2raya_temp" | cut -d ' ' -f1)
+    Sha256_arm64_Online=$(curl -sL https://zh.osdn.net/projects/v2raya/storage/releases/v$LatestVersion/info.json | grep "v2raya_linux_arm64_$LatestVersion" |  cut -d '"' -f4)
+        if [ $Sha256_arm64_local != $Sha256_arm64_Online ]; then
+        echo -e "\033[41;37m Error: Sha256 NOT match! Please check your network and try again. \033[0m"
+        exit 1
+        fi
     fi
     if [ $SystemArch != x86_64 ] && [ $SystemArch != aarch64 ];then
     echo "You have an unsupported system architecture, script will exit now!"
-    echo "You can build v2rayA with yourself."
+    echo "You can build v2rayA yourself."
     exit 9
     fi
 }
 
 StopService(){
     PID_of_v2rayA=$(pidof v2raya)
-    if [ -f /etc/systemd/system/v2raya.service ] && [ ! -n "$PID_of_v2ray"];then
-    echo "Stopping v2raya"
+    if [ -f /etc/systemd/system/v2raya.service ] && [ -n "$PID_of_v2ray"];then
+    echo "Stopping v2rayA..."
     systemctl stop v2raya
     v2rayAServiceStopped=1
-    elif [ -f /etc/init.d/v2raya ] && [ ! -n "$PID_of_v2ray"]; then
-    echo "Stopping v2raya"
+    elif [ -f /etc/init.d/v2raya ] && [ -n "$PID_of_v2ray"]; then
+    echo "Stopping v2rayA..."
     rc-service v2raya stop
     v2rayAServiceStopped=1
     else
@@ -137,9 +143,11 @@ StopService(){
 
 StartService(){
     if [ $v2rayAServiceStopped == 1 ] && [ -f /etc/systemd/system/v2raya.service ];then
+    echo "Starting v2rayA..."
     systemctl start v2raya
     fi
     if [ $v2rayAServiceStopped == 1 ] && [ -f /etc/init.d/v2raya ]; then
+    echo "Starting v2rayA..."
     rc-service v2raya start
     fi
 }
@@ -164,17 +172,18 @@ main(){
     GetSystemInformation
     CheckCurrentVersion
     CheckLatestVersion
-    if [ $CurrentVersion != $LatestVersion ];then
+    if [ $CurrentVersion == $LatestVersion ];then
+    echo "No update available, script exits."
+    else
     GetUrl
     Download_v2rayA
     StopService
+    echo "Installing v2rayA..."
     cp "/tmp/v2raya_temp" "/usr/local/bin/v2raya"
     chmod 755 "/usr/local/bin/v2raya"
     rm "/tmp/v2raya_temp"
     InstallService
     StartService
-    else
-    echo "No update available, script exits."
     fi
 }
 

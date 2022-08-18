@@ -108,7 +108,7 @@ Download_v2rayA(){
     #     echo -e "\033[41;37m Error: Sha256 NOT match! Please check your network and try again. \033[0m"
     #     exit 1
     #     fi
-    # fi
+    fi
     if [ $SystemArch == aarch64 ];then
     echo -e "\033[42;37m Downloading v2rayA... \033[0m"
     curl -Ls $DownloadUrlarm64 -o "/tmp/v2raya_temp"

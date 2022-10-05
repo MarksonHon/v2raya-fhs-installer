@@ -2,16 +2,27 @@
 
 GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"
 GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
-# OSDN_Mirror_URL="https://zh.osdn.net/projects/v2raya/storage/releases"
+OSDN_Mirror_URL="https://zh.osdn.net/projects/v2raya/storage/releases"
+LatestVersion=$(curl -s $GitHub_API_URL | jq -r '.tag_name' | cut -b 2-16)
 
 CheckLatestVersion(){
-    LatestVersion=$(curl -s $GitHub_API_URL | jq -r '.tag_name' | cut -b 2-16)
     echo "Latest Version is $LatestVersion"
 }
 
 GetUrl(){
-    DownloadUrlx64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
-    DownloadUrlarm64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
+    DownloadUrlGitHubx64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
+    DownloadUrlGitHubarm64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
+    DownloadUrlOSDNx64="$OSDN_Mirror_URL/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
+    DownloadUrlOSDNarm64="$OSDN_Mirror_URL/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
+    HttpCodeOSDN=$(curl -w "%{http_code}" -Is $OSDN_Mirror_URL/v$LatestVersion)
+    if [ "$HttpCodeOSDN" = "404" ]; then
+    DownloadUrlx64="$DownloadUrlGitHubx64"
+    DownloadUrlarm64="$DownloadUrlGitHubarm64"
+    echo "v2rayA will download from GitHub releases"
+    else
+    DownloadUrlx64="$DownloadUrlOSDNx64"
+    DownloadUrlOSDNarm64="$DownloadUrlOSDNarm64"
+    echo "v2rayA will download from an OSDM mirror"
 }
 
 CheckCurrentVersion(){
@@ -102,22 +113,10 @@ Download_v2rayA(){
     if [ $SystemArch == x86_64 ];then
     echo -e "\033[42;37m Downloading v2rayA... \033[0m"
     curl -Ls $DownloadUrlx64 -o "/tmp/v2raya_temp"
-    # Sha256_x64_local=$(sha256sum "/tmp/v2raya_temp" | cut -d ' ' -f1)
-    # Sha256_x64_Online=$(curl -sL https://zh.osdn.net/projects/v2raya/storage/releases/v$LatestVersion/info.json | grep "v2raya_linux_x64_$LatestVersion" |  cut -d '"' -f4)
-    #     if [ $Sha256_x64_local != $Sha256_x64_Online ]; then
-    #     echo -e "\033[41;37m Error: Sha256 NOT match! Please check your network and try again. \033[0m"
-    #     exit 1
-    #     fi
     fi
     if [ $SystemArch == aarch64 ];then
     echo -e "\033[42;37m Downloading v2rayA... \033[0m"
     curl -Ls $DownloadUrlarm64 -o "/tmp/v2raya_temp"
-    # Sha256_arm64_local=$(sha256sum "/tmp/v2raya_temp" | cut -d ' ' -f1)
-    # Sha256_arm64_Online=$(curl -sL https://zh.osdn.net/projects/v2raya/storage/releases/v$LatestVersion/info.json | grep "v2raya_linux_arm64_$LatestVersion" |  cut -d '"' -f4)
-        # if [ $Sha256_arm64_local != $Sha256_arm64_Online ]; then
-        # echo -e "\033[41;37m Error: Sha256 NOT match! Please check your network and try again. \033[0m"
-        # exit 1
-        # fi
     fi
     if [ $SystemArch != x86_64 ] && [ $SystemArch != aarch64 ];then
     echo "You have an unsupported system architecture, script will exit now!"

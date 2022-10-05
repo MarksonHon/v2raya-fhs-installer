@@ -21,7 +21,7 @@ GetUrl(){
     echo "v2rayA will download from GitHub releases"
     else
     DownloadUrlx64="$DownloadUrlOSDNx64"
-    DownloadUrlOSDNarm64="$DownloadUrlOSDNarm64"
+    DownloadUrlarm64="$DownloadUrlOSDNarm64"
     echo "v2rayA will download from an OSDM mirror"
 }
 

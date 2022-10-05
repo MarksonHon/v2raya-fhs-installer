@@ -5,7 +5,7 @@ GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
 # OSDN_Mirror_URL="https://zh.osdn.net/projects/v2raya/storage/releases"
 
 CheckLatestVersion(){
-    LatestVersion=$(curl -s $GitHub_API_URL | jq '.tag_name' | cut -d '"' -f2 | cut -b 2-16)
+    LatestVersion=$(curl -s $GitHub_API_URL | jq -r '.tag_name' | cut -b 2-16)
     echo "Latest Version is $LatestVersion"
 }
 

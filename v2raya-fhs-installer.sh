@@ -22,7 +22,7 @@ GetUrl(){
     else
     DownloadUrlx64="$DownloadUrlOSDNx64"
     DownloadUrlarm64="$DownloadUrlOSDNarm64"
-    echo "v2rayA will download from an OSDM mirror"
+    echo "v2rayA will download from an OSDN mirror"
     fi
 }
 
@@ -113,11 +113,11 @@ GetSystemInformation(){
 Download_v2rayA(){
     if [ $SystemArch == x86_64 ];then
     echo -e "\033[42;37m Downloading v2rayA... \033[0m"
-    curl -Ls $DownloadUrlx64 -o "/tmp/v2raya_temp"
+    curl --progress-bar -L $DownloadUrlx64 -o "/tmp/v2raya_temp"
     fi
     if [ $SystemArch == aarch64 ];then
     echo -e "\033[42;37m Downloading v2rayA... \033[0m"
-    curl -Ls $DownloadUrlarm64 -o "/tmp/v2raya_temp"
+    curl --progress-bar -L $DownloadUrlarm64 -o "/tmp/v2raya_temp"
     fi
     if [ $SystemArch != x86_64 ] && [ $SystemArch != aarch64 ];then
     echo "You have an unsupported system architecture, script will exit now!"

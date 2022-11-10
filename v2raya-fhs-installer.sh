@@ -15,7 +15,7 @@ GetUrl(){
     DownloadUrlOSDNx64="$OSDN_Mirror_URL/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
     DownloadUrlOSDNarm64="$OSDN_Mirror_URL/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
     HttpCodeOSDN=$(curl -w "%{http_code}" -Is $OSDN_Mirror_URL/v$LatestVersion)
-    if [ "$HttpCodeOSDN" = "404" ]; then
+    if [ "$HttpCodeOSDN" == "404" ]; then
     DownloadUrlx64="$DownloadUrlGitHubx64"
     DownloadUrlarm64="$DownloadUrlGitHubarm64"
     echo "v2rayA will download from GitHub releases"

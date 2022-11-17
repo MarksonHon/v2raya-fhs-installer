@@ -5,7 +5,7 @@
 Install `jq`, `curl` and `bash` on your system(some systems also need to install `pidof` by yourself), then run this command:
 
 ```bash
-curl -sL https://github.com/MarksonHon/v2raya-fhs-installer/raw/main/v2raya-fhs-installer.sh | sudo bash
+sudo bash -c "$(curl -sL https://github.com/MarksonHon/v2raya-fhs-installer/raw/main/v2raya-fhs-installer.sh)"
 ```
 
 This script supports `Systemd` and `OpenRC` init system on Linux, if you are using other init systems such as `runit`, `s6` or `dinit`, then you should write service config/script by yourself.

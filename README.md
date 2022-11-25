@@ -18,7 +18,7 @@ This script supports `Systemd` and `OpenRC` init system on Linux, if you are usi
 [Unit]
 Description=A Linux web GUI client of Project V which supports V2Ray, Xray, SS, SSR, Trojan and Pingtunnel
 Documentation=https://v2raya.org
-After=network.target nss-lookup.target iptables.service ip6tables.service
+After=network.target nss-lookup.target iptables.service ip6tables.service nftables.service
 Wants=network.target
 
 [Service]

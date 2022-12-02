@@ -24,6 +24,7 @@ Wants=network.target
 [Service]
 Environment="V2RAYA_CONFIG=/usr/local/etc/v2raya"
 Environment="V2RAYA_LOG_FILE=/tmp/v2raya.log"
+Environment="V2RAYA_ADDRESS=0.0.0.0:2017"
 Type=simple
 User=root
 LimitNPROC=500
@@ -44,7 +45,6 @@ This service script locales `/etc/init.d/v2raya`:
 
 name="v2rayA"
 description="A Linux web GUI client of Project V which supports V2Ray, Xray, SS, SSR, Trojan and Pingtunnel"
-
 command="/usr/local/bin/v2raya"
 command_args="--log-file /var/log/v2raya/access.log"
 error_log="/var/log/v2raya/error.log"
@@ -59,7 +59,8 @@ depend() {
 }
 
 start_pre() {
-   export V2RAYA_CONFIG=/usr/local/etc/v2raya
+   export V2RAYA_ADDRESS="0.0.0.0:2017"
+   export V2RAYA_CONFIG="/usr/local/etc/v2raya"
    if [ ! -d "/tmp/v2raya/" ]; then 
      mkdir "/tmp/v2raya" 
    fi
@@ -98,6 +99,7 @@ Edit v2rayA service file:
 
 export V2RAYA_CONFIG=/usr/local/etc/v2raya
 export V2RAYA_LOG_FILE=/tmp/v2raya.log
+export V2RAYA_ADDRESS=0.0.0.0:2017
 
 exec /usr/local/bin/v2raya
 ```

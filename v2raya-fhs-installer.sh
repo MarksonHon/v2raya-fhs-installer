@@ -1,5 +1,10 @@
 #! /bin/bash
 
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+RESET=$(tput sgr0)
+
 GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"
 GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
 OSDN_Mirror_URL="https://zh.osdn.net/projects/v2raya/storage/releases"
@@ -47,6 +52,7 @@ Wants=network.target
 [Service]
 Environment=\"V2RAYA_CONFIG=/usr/local/etc/v2raya\"
 Environment=\"V2RAYA_LOG_FILE=/tmp/v2raya.log\"
+Environment=\"V2RAYA_ADDRESS=0.0.0.0:2017\"
 Type=simple
 User=root
 LimitNPROC=500
@@ -85,7 +91,8 @@ depend() {
 }
 
 start_pre() {
-   export V2RAYA_CONFIG="/usr/local/etc/v2raya"
+   export V2RAYA_CONFIG=\"/usr/local/etc/v2raya\"
+   export V2RAYA_ADDRESS=\"0.0.0.0:2017\"
    if [ ! -d \"/tmp/v2raya/\" ]; then 
      mkdir \"/tmp/v2raya\" 
    fi
@@ -100,7 +107,7 @@ GetSystemInformation(){
     SystemType=$(uname)
     SystemArch=$(uname -m)
     if [ $SystemType != Linux ];then
-    echo -e "\033[41;37m No supported system found! \033[0m"
+    echo -e ${RED}\"No supported system found\!\"${RESET}    
     echo "This bash script is only for Linux which follows FHS stand,"
     echo "If you are using macOS, please visit:"
     echo "https://github.com/v2rayA/homebrew-v2raya"
@@ -112,15 +119,15 @@ GetSystemInformation(){
 
 Download_v2rayA(){
     if [ $SystemArch == x86_64 ];then
-    echo -e "\033[42;37m Downloading v2rayA... \033[0m"
+    echo "${GREEN}Downloading v2rayA...${RESET}[0m"
     curl --progress-bar -L $DownloadUrlx64 -o "/tmp/v2raya_temp"
     fi
     if [ $SystemArch == aarch64 ];then
-    echo -e "\033[42;37m Downloading v2rayA... \033[0m"
+    echo "${GREEN}Downloading v2rayA...${RESET}[0m"
     curl --progress-bar -L $DownloadUrlarm64 -o "/tmp/v2raya_temp"
     fi
     if [ $SystemArch != x86_64 ] && [ $SystemArch != aarch64 ];then
-    echo "You have an unsupported system architecture, script will exit now!"
+    echo ${RED}\"You have an unsupported system architecture, script will exit now\!\"${RESET}
     echo "You can build v2rayA yourself."
     exit 9
     fi
@@ -155,11 +162,25 @@ StartService(){
 InstallService(){
     if [ -f /sbin/openrc-run ]; then
     MakeOpenRCService
+    echo -e "${GREEN}-----------------------------------${RESET}"
+    echo -e "${GREEN}v2rayA will listen on 0.0.0.0:2017,${RESET}"
+    echo -e "${GREEN}However, if you don't want someone else${RESET}"
+    echo -e "${GREEN}to know you are running a proxy tool,${RESET}"
+    echo -e "${GREEN}you should edit service file to make${RESET}"
+    echo -e "${GREEN}v2rayA listen on 127.0.0.1:2017 instead.${RESET}"
+    echo -e "${GREEN}-----------------------------------${RESET}"
     chmod +x /etc/init.d/v2raya
     echo "If you want to start v2rayA at system startup, please run:"
     echo "rc-update add v2raya"
     elif [ -f /usr/lib/systemd/systemd ]; then
     MakeSystemDService
+    echo -e "${GREEN}-----------------------------------${RESET}"
+    echo -e "${GREEN}v2rayA will listen on 0.0.0.0:2017,${RESET}"
+    echo -e "${GREEN}However, if you don't want someone else${RESET}"
+    echo -e "${GREEN}to know you are running a proxy tool,${RESET}"
+    echo -e "${GREEN}you should edit service file to make${RESET}"
+    echo -e "${GREEN}v2rayA listen on 127.0.0.1:2017 instead.${RESET}"
+    echo -e "${GREEN}-----------------------------------${RESET}"
     echo "If you want to start v2rayA at system startup, please run:"
     echo "systemctl enable v2raya"
     else

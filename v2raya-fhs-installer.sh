@@ -42,6 +42,7 @@ CheckCurrentVersion(){
 
 MakeSystemDService(){
     if [ ! -f /etc/systemd/system/v2raya.service ]; then
+    ServiceFile="/etc/systemd/system/v2raya.service"
     echo "Making '/etc/systemd/system/v2raya.service'"
     echo "[Unit]
 Description=A Linux web GUI client of Project V which supports V2Ray, Xray, SS, SSR, Trojan and Pingtunnel
@@ -72,6 +73,7 @@ fi
 MakeOpenRCService(){
     if [ ! -f /etc/init.d/v2raya ]; then
     echo "Making /etc/init.d/v2raya"
+    ServiceFile="/etc/init.d/v2raya"
     echo "#!/sbin/openrc-run
 
 name=\"v2rayA\"
@@ -103,6 +105,20 @@ start_pre() {
 fi
 }
 
+NoticeUnsafe(){
+    echo -e "${GREEN}+++++++++++++++++++++++++++++++++++++++++${RESET}"
+    echo -e "${GREEN}-----------------------------------------${RESET}"
+    echo -e "${GREEN}v2rayA will listen on 0.0.0.0:2017,${RESET}"
+    echo -e "${GREEN}However, if you don't want someone else${RESET}"
+    echo -e "${GREEN}to know you are running a proxy tool,${RESET}"
+    echo -e "${GREEN}you should edit service file to make${RESET}"
+    echo -e "${GREEN}v2rayA listen on 127.0.0.1:2017 instead.${RESET}"
+    echo -e "${GREEN}Your service file is in this path: ${RESET}"
+    echo -e "${GREEN}$ServiceFile ${RESET}"
+    echo -e "${GREEN}-----------------------------------------${RESET}"
+    echo -e "${GREEN}+++++++++++++++++++++++++++++++++++++++++${RESET}"
+}
+
 GetSystemInformation(){
     SystemType=$(uname)
     SystemArch=$(uname -m)
@@ -119,7 +135,7 @@ GetSystemInformation(){
 
 Download_v2rayA(){
     if [ $SystemArch == x86_64 ];then
-    echo "${GREEN}Downloading v2rayA...${RESET}[0m"
+    echo "${GREEN}Downloading v2rayA...${RESET}"
     curl --progress-bar -L $DownloadUrlx64 -o "/tmp/v2raya_temp"
     fi
     if [ $SystemArch == aarch64 ];then
@@ -162,30 +178,18 @@ StartService(){
 InstallService(){
     if [ -f /sbin/openrc-run ]; then
     MakeOpenRCService
-    echo -e "${GREEN}-----------------------------------${RESET}"
-    echo -e "${GREEN}v2rayA will listen on 0.0.0.0:2017,${RESET}"
-    echo -e "${GREEN}However, if you don't want someone else${RESET}"
-    echo -e "${GREEN}to know you are running a proxy tool,${RESET}"
-    echo -e "${GREEN}you should edit service file to make${RESET}"
-    echo -e "${GREEN}v2rayA listen on 127.0.0.1:2017 instead.${RESET}"
-    echo -e "${GREEN}-----------------------------------${RESET}"
+    NoticeUnsafe
     chmod +x /etc/init.d/v2raya
-    echo "If you want to start v2rayA at system startup, please run:"
-    echo "rc-update add v2raya"
+    echo ${YELLOW}"If you want to start v2rayA at system startup, please run:"${RESET}
+    echo ${YELLOW}"rc-update add v2raya"${RESET}
     elif [ -f /usr/lib/systemd/systemd ]; then
     MakeSystemDService
-    echo -e "${GREEN}-----------------------------------${RESET}"
-    echo -e "${GREEN}v2rayA will listen on 0.0.0.0:2017,${RESET}"
-    echo -e "${GREEN}However, if you don't want someone else${RESET}"
-    echo -e "${GREEN}to know you are running a proxy tool,${RESET}"
-    echo -e "${GREEN}you should edit service file to make${RESET}"
-    echo -e "${GREEN}v2rayA listen on 127.0.0.1:2017 instead.${RESET}"
-    echo -e "${GREEN}-----------------------------------${RESET}"
-    echo "If you want to start v2rayA at system startup, please run:"
-    echo "systemctl enable v2raya"
+    NoticeUnsafe
+    echo ${YELLOW}"If you want to start v2rayA at system startup, please run:"${RESET}
+    echo ${YELLOW}"systemctl enable v2raya"${RESET}
     else
-    echo "No supported init system found, no service would be installed."
-    echo "However, v2rayA itself will be installed."
+    echo ${YELLOW}"No supported init system found, no service would be installed."${RESET}
+    echo ${YELLOW}"However, v2rayA itself will be installed."${RESET}
     fi
 }
 

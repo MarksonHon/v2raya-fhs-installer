@@ -1,9 +1,25 @@
 #! /bin/bash
 
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-YELLOW=$(tput setaf 3)
-RESET=$(tput sgr0)
+if [ -f /usr/bin/tput]; then
+    RED=$(tput setaf 1)
+    GREEN=$(tput setaf 2)
+    YELLOW=$(tput setaf 3)
+    RESET=$(tput sgr0)
+fi
+
+if [ ! -f $(which pidof)]; then
+    echo -e ${RED}\"Cannot find pidof\!\"${RESET}    
+    echo "Install pidof then try again."
+    WeShouldExit=1
+fi
+if [ ! -f $(which jq)]; then
+    echo -e ${RED}\"Cannot find jq\!\"${RESET}    
+    echo "Install jq then try again."
+    WeShouldExit=1
+fi
+if [ $WeShouldExit == 1]; then
+    exit 1
+fi
 
 GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"
 GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
@@ -82,7 +98,6 @@ depend() {
 
 start_pre() {
    export V2RAYA_CONFIG=\"/usr/local/etc/v2raya\"
-   export V2RAYA_ADDRESS=\"0.0.0.0:2017\"
    if [ ! -d \"/tmp/v2raya/\" ]; then 
      mkdir \"/tmp/v2raya\" 
    fi

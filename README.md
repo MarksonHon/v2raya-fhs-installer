@@ -110,6 +110,55 @@ Give the service script executable privilege:
 chmod 755 /etc/runit/sv/v2raya/run
 ```
 
+### Classic SysV Service Script
+
+A SysV service script can work in SysV Init, OpenRC and Systemd (Required systemd-sysv-compact installed).
+
+Note: `start-stop-daemon` should be installed to run this script.
+ 
+```sh
+#!/bin/bash 
+# chkconfig: 2345 99 01
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+v2rayA_bin=$(which v2raya)
+
+if [ ! -d \"/tmp/v2raya/\" ]; then 
+    mkdir \"/tmp/v2raya\" 
+fi
+if [ ! -d \"/var/log/v2raya/\" ]; then
+    ln -s \"/tmp/v2raya/\" \"/var/log/\"
+fi
+
+export V2RAYA_CONFIG="/usr/local/etc/v2raya"
+export V2RAYA_LOG_FILE="/tmp/v2raya/v2raya.log"
+
+case "$1" in
+    start)
+        echo "Starting V2raya"
+        start-stop-daemon --start --background --pidfile /var/run/v2raya.pid --make-pidfile --exec $v2rayA_bin
+        ;;
+
+    stop)
+        echo "Stopping V2raya"
+        start-stop-daemon --stop --pidfile /var/run/v2raya.pid
+        ;;
+
+    restart)
+        echo "Restarting V2raya"
+        start-stop-daemon --stop --pidfile /var/run/v2raya.pid
+        sleep 5
+        start-stop-daemon --start --background --pidfile /var/run/v2raya.pid --make-pidfile --exec $v2rayA_bin
+        ;;
+
+    log)
+        echo "Displaying V2raya Logs"
+        tail -f /var/log/v2raya/v2raya.log
+        ;;
+esac
+exit 0
+```
+
 ## Thanks to
 
 1. V2Ray Systemd Installation Script  

@@ -7,7 +7,6 @@ RESET=$(tput sgr0)
 
 GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"
 GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
-OSDN_Mirror_URL="https://zh.osdn.net/projects/v2raya/storage/releases"
 LatestVersion=$(curl -s $GitHub_API_URL | jq -r '.tag_name' | cut -b 2-16)
 
 CheckLatestVersion(){
@@ -17,18 +16,8 @@ CheckLatestVersion(){
 GetUrl(){
     DownloadUrlGitHubx64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
     DownloadUrlGitHubarm64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
-    DownloadUrlOSDNx64="$OSDN_Mirror_URL/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
-    DownloadUrlOSDNarm64="$OSDN_Mirror_URL/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
-    HttpCodeOSDN=$(curl -w "%{http_code}" -Is $OSDN_Mirror_URL/v$LatestVersion)
-    #if [ "$HttpCodeOSDN" == "404" ]; then
     DownloadUrlx64="$DownloadUrlGitHubx64"
     DownloadUrlarm64="$DownloadUrlGitHubarm64"
-    echo "v2rayA will download from GitHub releases"
-    #else
-    #DownloadUrlx64="$DownloadUrlOSDNx64"
-    #DownloadUrlarm64="$DownloadUrlOSDNarm64"
-    #echo "v2rayA will download from an OSDN mirror"
-    #fi
 }
 
 CheckCurrentVersion(){
@@ -41,8 +30,8 @@ CheckCurrentVersion(){
 }
 
 MakeSystemDService(){
-    if [ ! -f /etc/systemd/system/v2raya.service ]; then
     ServiceFile="/etc/systemd/system/v2raya.service"
+    ServiceConf="/etc/systemd/system/v2raya.service.d/"
     echo "Making '/etc/systemd/system/v2raya.service'"
     echo "[Unit]
 Description=A Linux web GUI client of Project V which supports V2Ray, Xray, SS, SSR, Trojan and Pingtunnel
@@ -63,17 +52,16 @@ Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target" > /etc/systemd/system/v2raya.service
-fi
-if [ ! -d "/etc/systemd/system/v2raya.service.d/" ]; then
-    echo "Marking '/etc/systemd/system/v2raya.service.d/'"
-    mkdir -p /etc/systemd/system/v2raya.service.d/
+if [ ! -d "$ServiceConf" ]; then
+    echo "Marking $ServiceConf"
+    mkdir -p $ServiceConf
 fi
 }
 
 MakeOpenRCService(){
-    if [ ! -f /etc/init.d/v2raya ]; then
     echo "Making /etc/init.d/v2raya"
     ServiceFile="/etc/init.d/v2raya"
+    ServiceConf="/etc/conf.d/v2raya"
     echo "#!/sbin/openrc-run
 
 name=\"v2rayA\"
@@ -102,6 +90,12 @@ start_pre() {
    ln -s \"/tmp/v2raya/\" \"/var/log/\"
    fi
 }" > '/etc/init.d/v2raya'
+if [ ! -f "/etc/conf.d/v2raya" ]; then
+    echo "Marking '/etc/conf.d/v2raya'"
+    echo "# See wiki to know how to add envs
+# example:
+# export V2RAYA_ADDRESS=\"0.0.0.0:2017\"
+"
 fi
 }
 
@@ -115,6 +109,8 @@ NoticeUnsafe(){
     echo -e "${GREEN}v2rayA listen on 127.0.0.1:2017 instead.${RESET}"
     echo -e "${GREEN}Your service file is in this path: ${RESET}"
     echo -e "${GREEN}$ServiceFile ${RESET}"
+    echo -e "${GREEN}Your service config is in this path: ${RESET}"
+    echo -e "${GREEN}$ServiceConf ${RESET}"
     echo -e "${GREEN}-----------------------------------------${RESET}"
     echo -e "${GREEN}+++++++++++++++++++++++++++++++++++++++++${RESET}"
 }

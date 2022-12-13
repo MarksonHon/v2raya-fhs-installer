@@ -1,24 +1,10 @@
-#! /bin/bash
+#!/bin/bash
 
 if [ -f /usr/bin/tput ]; then
     RED=$(tput setaf 1)
     GREEN=$(tput setaf 2)
     YELLOW=$(tput setaf 3)
     RESET=$(tput sgr0)
-fi
-
-if [ ! -f $(which pidof) ]; then
-    echo -e ${RED}\"Cannot find pidof\!\"${RESET}    
-    echo "Install pidof then try again."
-    WeShouldExit=1
-fi
-if [ ! -f $(which jq) ]; then
-    echo -e ${RED}\"Cannot find jq\!\"${RESET}    
-    echo "Install jq then try again."
-    WeShouldExit=1
-fi
-if [ $WeShouldExit == 1 ]; then
-    exit 1
 fi
 
 GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"

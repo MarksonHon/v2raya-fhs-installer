@@ -1,10 +1,17 @@
 #!/bin/bash
 
-if [ -f /usr/bin/tput ]; then
+if [ -f /usr/local/bin/tput ] || [ -f /usr/bin/tput ] || [ -f /bin/tput ]; then
     RED=$(tput setaf 1)
     GREEN=$(tput setaf 2)
     YELLOW=$(tput setaf 3)
     RESET=$(tput sgr0)
+fi
+
+if [ -f /usr/local/bin/curl ] || [ -f /usr/bin/curl ] || [ -f /bin/tput ]; then
+    echo "curl is installed, continue installation."
+else
+    echo "curl is not installed, please install curl first."
+    exit 1
 fi
 
 GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"

@@ -109,7 +109,7 @@ if [ ! -f "/etc/conf.d/v2raya" ]; then
     echo "# See wiki to know how to add envs
 # example:
 # export V2RAYA_ADDRESS=\"0.0.0.0:2017\"
-"
+" > '/etc/conf.d/v2raya'
 fi
 }
 

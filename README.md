@@ -59,7 +59,6 @@ depend() {
 }
 
 start_pre() {
-   export V2RAYA_ADDRESS="0.0.0.0:2017"
    export V2RAYA_CONFIG="/usr/local/etc/v2raya"
    if [ ! -d "/tmp/v2raya/" ]; then 
      mkdir "/tmp/v2raya" 
@@ -99,7 +98,6 @@ Edit v2rayA service file:
 
 export V2RAYA_CONFIG=/usr/local/etc/v2raya
 export V2RAYA_LOG_FILE=/tmp/v2raya.log
-export V2RAYA_ADDRESS=0.0.0.0:2017
 
 exec /usr/local/bin/v2raya
 ```
@@ -123,11 +121,11 @@ Note: `start-stop-daemon` should be installed to run this script.
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 v2rayA_bin=$(which v2raya)
 
-if [ ! -d \"/tmp/v2raya/\" ]; then 
-    mkdir \"/tmp/v2raya\" 
+if [ ! -d "/tmp/v2raya/" ]; then 
+    mkdir "/tmp/v2raya" 
 fi
-if [ ! -d \"/var/log/v2raya/\" ]; then
-    ln -s \"/tmp/v2raya/\" \"/var/log/\"
+if [ ! -d "/var/log/v2raya/" ]; then
+    ln -s "/tmp/v2raya/" "/var/log/"
 fi
 
 export V2RAYA_CONFIG="/usr/local/etc/v2raya"

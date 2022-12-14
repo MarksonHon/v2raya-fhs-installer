@@ -18,8 +18,15 @@ CheckLatestVersion(){
 GetUrl(){
     DownloadUrlGitHubx64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
     DownloadUrlGitHubarm64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
+    DownloadUrlGhProxyx64="https://ghproxy.com/$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
+    DownloadUrlGhProxyarm64="https://ghproxy.com/$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
+    if [ $1 == use-ghproxy ]; then
+    DownloadUrlx64="$DownloadUrlGhProxyx64"
+    DownloadUrlarm64="$DownloadUrlGhProxyarm64"
+    else
     DownloadUrlx64="$DownloadUrlGitHubx64"
     DownloadUrlarm64="$DownloadUrlGitHubarm64"
+    fi
 }
 
 CheckCurrentVersion(){
@@ -44,7 +51,6 @@ Wants=network.target
 [Service]
 Environment=\"V2RAYA_CONFIG=/usr/local/etc/v2raya\"
 Environment=\"V2RAYA_LOG_FILE=/tmp/v2raya.log\"
-Environment=\"V2RAYA_ADDRESS=0.0.0.0:2017\"
 Type=simple
 User=root
 LimitNPROC=500
@@ -101,7 +107,6 @@ fi
 }
 
 NoticeUnsafe(){
-    echo -e "${GREEN}+++++++++++++++++++++++++++++++++++++++++${RESET}"
     echo -e "${GREEN}-----------------------------------------${RESET}"
     echo -e "${GREEN}v2rayA will listen on 0.0.0.0:2017,${RESET}"
     echo -e "${GREEN}However, if you don't want someone else${RESET}"
@@ -113,7 +118,6 @@ NoticeUnsafe(){
     echo -e "${GREEN}Your service config is in this path: ${RESET}"
     echo -e "${GREEN}$ServiceConf ${RESET}"
     echo -e "${GREEN}-----------------------------------------${RESET}"
-    echo -e "${GREEN}+++++++++++++++++++++++++++++++++++++++++${RESET}"
 }
 
 GetSystemInformation(){

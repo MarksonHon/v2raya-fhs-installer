@@ -24,7 +24,6 @@ Wants=network.target
 [Service]
 Environment="V2RAYA_CONFIG=/usr/local/etc/v2raya"
 Environment="V2RAYA_LOG_FILE=/tmp/v2raya.log"
-Environment="V2RAYA_ADDRESS=0.0.0.0:2017"
 Type=simple
 User=root
 LimitNPROC=500

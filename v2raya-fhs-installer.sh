@@ -9,7 +9,7 @@ fi
 
 GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"
 GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
-LatestVersion=$(curl -s $GitHub_API_URL | jq -r '.tag_name' | cut -b 2-16)
+LatestVersion=$(curl -s $GitHub_API_URL | grep 'tag_name' | awk -F '"' '{print $4}' | awk -F 'v' '{print $2}')
 
 CheckLatestVersion(){
     echo "Latest Version is $LatestVersion"

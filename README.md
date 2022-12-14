@@ -2,7 +2,7 @@
 
 ## Installation Instructions
 
-Install `jq`, `curl` and `bash` on your system(some systems also need to install `pidof` by yourself), then run this command:
+Install `curl` and `bash` on your system(some systems also need to install `pidof` by yourself), then run this command:
 
 ```bash
 sudo bash -c "$(curl -sL https://github.com/MarksonHon/v2raya-fhs-installer/raw/main/v2raya-fhs-installer.sh)"

@@ -7,7 +7,7 @@ if [ -f /usr/local/bin/tput ] || [ -f /usr/bin/tput ] || [ -f /bin/tput ]; then
     RESET=$(tput sgr0)
 fi
 
-if [ -f /usr/local/bin/curl ] || [ -f /usr/bin/curl ] || [ -f /bin/tput ]; then
+if [ -f /usr/local/bin/curl ] || [ -f /usr/bin/curl ] || [ -f /bin/curl ]; then
     echo "curl is installed, continue installation."
 else
     echo "curl is not installed, please install curl first."

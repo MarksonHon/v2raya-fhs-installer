@@ -25,11 +25,9 @@ CheckLatestVersion(){
 GetUrl(){
     DownloadUrlGitHubx64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
     DownloadUrlGitHubarm64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
-    DownloadUrlGhProxyx64="https://ghproxy.com/$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
-    DownloadUrlGhProxyarm64="https://ghproxy.com/$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
     if [ "$1" == '--use-ghproxy' ]; then
-    DownloadUrlx64="$DownloadUrlGhProxyx64"
-    DownloadUrlarm64="$DownloadUrlGhProxyarm64"
+    DownloadUrlx64="https://ghproxy.com/$DownloadUrlGitHubx64"
+    DownloadUrlarm64="https://ghproxy.com/$DownloadUrlGitHubarm64"
     else
     DownloadUrlx64="$DownloadUrlGitHubx64"
     DownloadUrlarm64="$DownloadUrlGitHubarm64"

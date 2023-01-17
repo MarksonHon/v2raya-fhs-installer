@@ -27,7 +27,7 @@ GetUrl(){
     DownloadUrlGitHubarm64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
     DownloadUrlGhProxyx64="https://ghproxy.com/$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
     DownloadUrlGhProxyarm64="https://ghproxy.com/$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
-    if [ "$1" == "use-ghproxy" ]; then
+    if [[ $1 == use-ghproxy ]]; then
     DownloadUrlx64="$DownloadUrlGhProxyx64"
     DownloadUrlarm64="$DownloadUrlGhProxyarm64"
     else
@@ -71,6 +71,7 @@ if [ ! -d "$ServiceConf" ]; then
     echo "Marking $ServiceConf"
     mkdir -p $ServiceConf
 fi
+systemctl daemon-reload
 }
 
 MakeOpenRCService(){
@@ -144,10 +145,12 @@ GetSystemInformation(){
 Download_v2rayA(){
     if [ $SystemArch == x86_64 ];then
     echo "${GREEN}Downloading v2rayA...${RESET}"
+    echo $DownloadUrlx64
     curl --progress-bar -L $DownloadUrlx64 -o "/tmp/v2raya_temp"
     fi
     if [ $SystemArch == aarch64 ];then
     echo "${GREEN}Downloading v2rayA...${RESET}[0m"
+    echo $DownloadUrlarm64
     curl --progress-bar -L $DownloadUrlarm64 -o "/tmp/v2raya_temp"
     fi
     if [ $SystemArch != x86_64 ] && [ $SystemArch != aarch64 ];then

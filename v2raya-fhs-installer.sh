@@ -1,48 +1,15 @@
 #!/bin/bash
 
-## Pre
-if [ -f /usr/local/bin/tput ] || [ -f /usr/bin/tput ] || [ -f /bin/tput ]; then
+## Color
+if command -v tput > /dev/null 2>&1; then
     RED=$(tput setaf 1)
     GREEN=$(tput setaf 2)
     YELLOW=$(tput setaf 3)
     RESET=$(tput sgr0)
 fi
 
-if [ -f /usr/local/bin/curl ] || [ -f /usr/bin/curl ] || [ -f /bin/curl ]; then
-    echo "curl is installed, continue installation."
-else
-    echo "curl is not installed, please install curl first."
-    exit 1
-fi
-
-## Urls
-GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"
-GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
-LatestVersion=$(curl -s $GitHub_API_URL | grep 'tag_name' | awk -F '"' '{print $4}' | awk -F 'v' '{print $2}')
-DownloadUrlGitHubx64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_x64_$LatestVersion"
-DownloadUrlGitHubarm64="$GitHub_Release_URL/download/v$LatestVersion/v2raya_linux_arm64_$LatestVersion"
-if [ "$1" == '--use-ghproxy' ]; then
-    DownloadUrlx64="https://ghproxy.com/$DownloadUrlGitHubx64"
-    DownloadUrlarm64="https://ghproxy.com/$DownloadUrlGitHubarm64"
-else
-    DownloadUrlx64="$DownloadUrlGitHubx64"
-    DownloadUrlarm64="$DownloadUrlGitHubarm64"
-fi
-
-CheckLatestVersion(){
-    echo "Latest Version is $LatestVersion"
-}
-
-CheckCurrentVersion(){
-    if [ ! -f /usr/local/bin/v2raya ]; then
-        CurrentVersion="none"
-    else
-        CurrentVersion=$(/usr/local/bin/v2raya --version)
-    fi
-    echo "Current Version is $CurrentVersion"
-}
-
-MakeSystemDService(){
+## Systemd service
+Create_SystemD_Service(){
     ServiceFile="/etc/systemd/system/v2raya.service"
     ServiceConf="/etc/systemd/system/v2raya.service.d/"
     echo "Making '/etc/systemd/system/v2raya.service'"
@@ -64,14 +31,15 @@ Restart=on-failure
 
 [Install]
     WantedBy=multi-user.target" > /etc/systemd/system/v2raya.service
-    if [ ! -d "$ServiceConf" ]; then
-        echo "Marking $ServiceConf"
-        mkdir -p $ServiceConf
-    fi
-    systemctl daemon-reload
+if [ ! -d "$ServiceConf" ]; then
+    echo "Marking $ServiceConf"
+    mkdir -p $ServiceConf
+fi
+systemctl daemon-reload
 }
 
-MakeOpenRCService(){
+## OpenRC Service
+Create_OpenRC_Service(){
     echo "Making /etc/init.d/v2raya"
     ServiceFile="/etc/init.d/v2raya"
     ServiceConf="/etc/conf.d/v2raya"
@@ -102,16 +70,16 @@ start_pre() {
    ln -s \"/tmp/v2raya/\" \"/var/log/\"
    fi
     }" > '/etc/init.d/v2raya'
-    if [ ! -f "/etc/conf.d/v2raya" ]; then
-        echo "Marking '/etc/conf.d/v2raya'"
-        echo "# See wiki to know how to add envs
+if [ ! -f "/etc/conf.d/v2raya" ]; then
+    echo "Marking '/etc/conf.d/v2raya'"
+    echo '# See wiki to know how to add env
 # example:
-# export V2RAYA_ADDRESS=\"0.0.0.0:2017\"
-        " > '/etc/conf.d/v2raya'
-    fi
+# export V2RAYA_ADDRESS="0.0.0.0:2017"' > '/etc/conf.d/v2raya'
+fi
 }
 
-NoticeUnsafe(){
+## Notice
+Notice_Unsafe(){
     echo -e "${GREEN}-----------------------------------------${RESET}"
     echo -e "${GREEN}v2rayA will listen on 0.0.0.0:2017,${RESET}"
     echo -e "${GREEN}However, if you don't want someone else${RESET}"
@@ -125,39 +93,8 @@ NoticeUnsafe(){
     echo -e "${GREEN}-----------------------------------------${RESET}"
 }
 
-GetSystemInformation(){
-    SystemType=$(uname)
-    SystemArch=$(uname -m)
-    if [ $SystemType != Linux ];then
-        echo -e ${RED}\"No supported system found\!\"${RESET}
-        echo "This bash script is only for Linux which follows FHS stand,"
-        echo "If you are using macOS, please visit:"
-        echo "https://github.com/v2rayA/homebrew-v2raya"
-        echo "If you are using Windows, please visit:"
-        echo "https://github.com/v2rayA/v2raya-scoop"
-        exit 9
-    fi
-}
-
-Download_v2rayA(){
-    if [ $SystemArch == x86_64 ];then
-        echo "${GREEN}Downloading v2rayA...${RESET}"
-        echo $DownloadUrlx64
-        curl --progress-bar -L $DownloadUrlx64 -o "/tmp/v2raya_temp"
-    fi
-    if [ $SystemArch == aarch64 ];then
-        echo "${GREEN}Downloading v2rayA...${RESET}[0m"
-        echo $DownloadUrlarm64
-        curl --progress-bar -L $DownloadUrlarm64 -o "/tmp/v2raya_temp"
-    fi
-    if [ $SystemArch != x86_64 ] && [ $SystemArch != aarch64 ];then
-        echo ${RED}\"You have an unsupported system architecture, script will exit now\!\"${RESET}
-        echo "You can build v2rayA yourself."
-        exit 9
-    fi
-}
-
-StopService(){
+## Service Control
+Stop_Service(){
     PID_of_v2rayA=$(pidof v2raya)
     if [ -f /etc/systemd/system/v2raya.service ] && [ -n "$PID_of_v2ray"];then
         echo "Stopping v2rayA..."
@@ -172,7 +109,7 @@ StopService(){
     fi
 }
 
-StartService(){
+Start_Service(){
     if [ $v2rayAServiceStopped == 1 ] && [ -f /etc/systemd/system/v2raya.service ];then
         echo "Starting v2rayA..."
         systemctl start v2raya
@@ -183,40 +120,108 @@ StartService(){
     fi
 }
 
-InstallService(){
+Install_Service(){
     if [ -f /sbin/openrc-run ]; then
-        MakeOpenRCService
-        NoticeUnsafe
+        Create_OpenRC_Service
+        Notice_Unsafe
         chmod +x /etc/init.d/v2raya
         echo ${YELLOW}"If you want to start v2rayA at system startup, please run:"${RESET}
         echo ${YELLOW}"rc-update add v2raya"${RESET}
         elif [ -f /usr/lib/systemd/systemd ]; then
-        MakeSystemDService
-        NoticeUnsafe
+        Create_SystemD_Service
+        Notice_Unsafe
         echo ${YELLOW}"If you want to start v2rayA at system startup, please run:"${RESET}
         echo ${YELLOW}"systemctl enable v2raya"${RESET}
     else
-        echo ${YELLOW}"No supported init system found, no service would be installed."${RESET}
+        echo ${YELLOW}"No supported init system found, so no service would be installed."${RESET}
         echo ${YELLOW}"However, v2rayA itself will be installed."${RESET}
     fi
 }
 
-main(){
-    GetSystemInformation
-    CheckCurrentVersion
-    CheckLatestVersion
-    if [ $CurrentVersion == $LatestVersion ];then
-        echo "No update available, script exits."
+## Check curl
+if ! command -v curl > /dev/null 2>&1; then
+    if command -v apt > /dev/null 2>&1; then
+    apt update; apt install curl -y
+    elif command -v dnf > /dev/null 2>&1; then
+    dnf install curl -y
+    elif command -v yum > /dev/null  2>&1; then
+    yum install curl -y
+    elif command -v zypper > /dev/null 2>&1; then
+    zypper install --non-interactive curl
+    elif command -v pacman > /dev/null 2>&1; then
+    pacman -S curl --noconfirm
+    elif command -v apk > /dev/null 2>&1; then
+    apk add curl
     else
-        Download_v2rayA
-        StopService
-        echo "Installing v2rayA..."
-        cp "/tmp/v2raya_temp" "/usr/local/bin/v2raya"
-        chmod 755 "/usr/local/bin/v2raya"
-        rm "/tmp/v2raya_temp"
-        InstallService
-        StartService
+    echo "curl not installed, stop installation, please install curl and try again!"
+    exit 1
     fi
-}
+fi
 
-main "$@"
+## Check URL
+GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"
+GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
+v2rayA_mirror_URL="https://hubmirror.v2raya.org/v2rayA/v2rayA/releases/latest"
+Latest_version=$(curl -s $GitHub_API_URL | grep 'tag_name' | awk -F '"' '{print $4}' | awk -F 'v' '{print $2}')
+if [[ $(uname) == 'Linux' ]]; then
+case "$(uname -m)" in
+      'i386' | 'i686')
+        MACHINE='x86'
+        ;;
+      'amd64' | 'x86_64')
+        MACHINE='x64'
+        ;;
+      'armv7' | 'armv7l')
+        MACHINE='arm'
+        ;;
+      'armv8' | 'aarch64')
+        MACHINE='arm64'
+        ;;
+      *)
+        echo "error: The architecture is not supported."
+        exit 1
+        ;;
+    esac
+else
+    echo -e ${RED}"No supported system found!"${RESET}
+    echo "This bash script is only for Linux which follows FHS stand,"
+    echo "If you are using macOS, please visit:"
+    echo "https://github.com/v2rayA/homebrew-v2raya"
+    echo "If you are using Windows, please visit:"
+    echo "https://github.com/v2rayA/v2raya-scoop"
+    exit 1
+fi
+if [ "$1" == '--use-ghproxy' ]; then
+    URL="https://ghproxy.com/$GitHub_Release_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
+elif [ "$1" == '--use-mirror' ]; then
+    URL="v2rayA_mirror_URL//download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
+else
+    URL="$GitHub_Release_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
+fi
+# Local_SHA256=$(sha256sum /tmp/v2raya_temp | awk '{printf $1}')
+# Remote_SHA256=$(curl -sL $URL.sha256.txt)
+
+## Installation
+PID_of_v2rayA=$(pidof v2raya)
+echo -e "${GREEN}Downloading v2rayA for $MACHINE${RESET}"
+echo -e "${GREEN}Downloading from $URL${RESET}"
+curl --progress-bar -L -o /tmp/v2raya_temp $URL
+# if [[ $Local_SHA256 == $Remote_SHA256 ]]; then
+#     echo -e "${GREEN}Download success!${RESET}"
+# else
+#     echo -e "${RED}SHA256 check failed! Check your network and try again!${RESET}"
+#     exit 1
+# fi
+echo -e "${GREEN}Installing v2rayA${RESET}"
+if [ ! -d "/usr/local/bin" ]; then
+    mkdir -p "/usr/local/bin"
+fi
+if [ ! -d "/usr/local/etc/v2raya" ]; then
+    mkdir -p "/usr/local/etc/v2raya"
+fi
+Stop_Service
+mv /tmp/v2raya_temp /usr/local/bin/v2raya
+chmod +x /usr/local/bin/v2raya
+Install_Service
+Start_Service
+echo -e "${GREEN}v2rayA installed successfully!${RESET}"

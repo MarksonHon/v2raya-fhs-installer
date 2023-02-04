@@ -194,7 +194,7 @@ fi
 if [ "$1" == '--use-ghproxy' ]; then
     URL="https://ghproxy.com/$GitHub_Release_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
 elif [ "$1" == '--use-mirror' ]; then
-    URL="v2rayA_mirror_URL//download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
+    URL="v2rayA_mirror_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
 else
     URL="$GitHub_Release_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
 fi

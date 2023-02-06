@@ -161,7 +161,7 @@ fi
 ## Check URL
 GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"
 GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
-v2rayA_mirror_URL="https://hubmirror.v2raya.org/v2rayA/v2rayA/releases/latest"
+v2rayA_mirror_URL="https://hubmirror.v2raya.org/v2rayA/v2rayA/releases"
 Latest_version=$(curl -s $GitHub_API_URL | grep 'tag_name' | awk -F '"' '{print $4}' | awk -F 'v' '{print $2}')
 if [[ $(uname) == 'Linux' ]]; then
 case "$(uname -m)" in

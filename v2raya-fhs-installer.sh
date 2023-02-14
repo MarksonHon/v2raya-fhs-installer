@@ -158,6 +158,7 @@ Install_v2ray{
         exit 1
         ;;
     esac
+    fi
     v2ray_latest_tag="$(curl -s https://api.github.com/repos/v2fly/v2ray-core/releases/latest | grep "tag_name" | awk -F '"' '{print $4}')"
     v2ray_current_tag="v$(/usr/local/bin/v2ray version | grep V2Ray | awk '{print $2}')"
     if [  "$v2ray_latest_tag" != "$v2ray_current_tag" ]; then

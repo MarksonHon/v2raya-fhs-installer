@@ -138,6 +138,30 @@ Install_Service(){
     fi
 }
 
+Install_v2ray{
+    if ! command -v v2ray > /dev/null 2>&1; then
+        echo "Installing v2ray..."
+        v2ray_latest_tag="$(curl -s https://api.github.com/repos/v2fly/v2ray-core/releases/latest | grep "tag_name" | awk -F '"' '{print $4}')"
+        v2ray_latest_url="https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$MACHINE.zip"
+        v2ray_latest_hash="$(curl -sL $v2ray_latest_url.dgst | awk -F '= ' '/256=/ {print $2}')"
+        curl --progress-bar -L -H "Cache-Control: no-cache" -o "/tmp/v2ray.zip" "$v2ray_latest_url"
+        v2ray_local_hash="$(sha256sum /tmp/v2ray.zip | awk '{print $1}')"
+        if [ "$v2ray_latest_hash" != "$v2ray_local_hash" ]; then
+            echo "v2ray SHA256 mismatch!"
+            echo "Expected: $v2ray_latest_hash"
+            echo "Actual: $v2ray_local_hash"
+            echo "Please try again."
+            exit 1
+        fi
+        unzip /tmp/v2ray.zip -d /tmp/v2ray
+        mkdir -p /usr/local/share/v2ray
+        mv /tmp/v2ray/*dat /usr/local/share/v2ray
+        mv /tmp/v2ray/v2ray /usr/local/bin/v2ray
+        chmod 755 /usr/local/bin/v2ray
+        rm -rf /tmp/v2ray /tmp/v2ray.zip
+    fi
+}
+
 ## Check curl
 if ! command -v curl > /dev/null 2>&1; then
     if command -v apt > /dev/null 2>&1; then
@@ -156,6 +180,14 @@ if ! command -v curl > /dev/null 2>&1; then
     echo "curl not installed, stop installation, please install curl and try again!"
     exit 1
     fi
+fi
+
+## Don't install on OpenWrt
+if [ -f /etc/openwrt_release ]; then
+    echo "OpenWrt is not supported, please install"
+    echo "v2rayA from v2rayA for OpenWrt: "
+    echo "https://github.com/v2rayA/v2rayA-openwrt"
+    exit 1
 fi
 
 ## Check URL
@@ -206,10 +238,11 @@ PID_of_v2rayA=$(pidof v2raya)
 echo -e "${GREEN}Downloading v2rayA for $MACHINE${RESET}"
 echo -e "${GREEN}Downloading from $URL${RESET}"
 curl --progress-bar -L -o /tmp/v2raya_temp $URL
-# if [[ $Local_SHA256 == $Remote_SHA256 ]]; then
-#     echo -e "${GREEN}Download success!${RESET}"
-# else
-#     echo -e "${RED}SHA256 check failed! Check your network and try again!${RESET}"
+# if [ "$Local_SHA256" != "$Remote_SHA256" ]; then
+#     echo "v2rayA SHA256 mismatch!"
+#     echo "Expected: $Remote_SHA256"
+#     echo "Actual: $Local_SHA256"
+#     echo "Please try again."
 #     exit 1
 # fi
 echo -e "${GREEN}Installing v2rayA${RESET}"
@@ -220,8 +253,10 @@ if [ ! -d "/usr/local/etc/v2raya" ]; then
     mkdir -p "/usr/local/etc/v2raya"
 fi
 Stop_Service
-mv /tmp/v2raya_temp /usr/local/bin/v2raya
+cp /tmp/v2raya_temp /usr/local/bin/v2raya
 chmod +x /usr/local/bin/v2raya
+Install_v2ray
 Install_Service
 Start_Service
 echo -e "${GREEN}v2rayA installed successfully!${RESET}"
+rm -f /tmp/v2raya_temp

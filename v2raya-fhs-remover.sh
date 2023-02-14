@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script is used to remove v2rayA from your system.
-# It is a part of v2rayA's FHS installer.
+# It is part of v2rayA's FHS installer.
 
 if [ -f /etc/systemd/system/v2raya.service ];then
     systemctl disable v2raya --now
@@ -20,3 +20,5 @@ fi
 rm -f /usr/local/bin/v2raya
 
 echo "v2rayA has been removed from your system."
+echo "However you may need to remove v2rayA's config files manually."
+echo "Your config files are in this path: /usr/local/etc/v2raya"

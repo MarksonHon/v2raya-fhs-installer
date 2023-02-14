@@ -143,9 +143,9 @@ Install_v2ray(){
     v2ray_latest_tag="$(curl -s https://api.github.com/repos/v2fly/v2ray-core/releases/latest | grep "tag_name" | awk -F '"' '{print $4}')"
     if [ $1 == "--use-mirror" ]; then
         v2ray_latest_url="https://hubmirror.v2raya.org/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
-        elif [ $1 == "--use-ghproxy" ]; then
+    elif [ $1 == "--use-ghproxy" ]; then
         v2ray_latest_url="https://ghproxy.com/https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
-        else
+    else
         v2ray_latest_url="https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
     fi
     if [ "$v2ray_latest_tag" != "$v2ray_current_tag" ]; then
@@ -171,6 +171,15 @@ Install_v2ray(){
 }
 
 Install_v2raya(){
+    if [ "$1" == '--use-ghproxy' ]; then
+        URL="https://ghproxy.com/$GitHub_Release_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
+    elif [ "$1" == '--use-mirror' ]; then
+        URL="$v2rayA_mirror_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
+    else
+        URL="$GitHub_Release_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
+    fi
+    Local_SHA256="$(sha256sum /tmp/v2raya_temp | awk '{print $1}')"
+    Remote_SHA256="$(curl -sL $URL.sha256.txt)"
     PID_of_v2rayA=$(pidof v2raya)
     echo -e "${GREEN}Downloading v2rayA for $MACHINE${RESET}"
     echo -e "${GREEN}Downloading from $URL${RESET}"
@@ -274,4 +283,9 @@ else
     echo "https://github.com/v2rayA/v2raya-scoop"
     exit 1
 fi
+if [ $(/usr/local/bin/v2raya --version) == $Latest_version ]; then
+    echo -e "${GREEN}v2rayA is already the latest version.${RESET}"
+    exit 0
+else
 Install_v2raya
+fi

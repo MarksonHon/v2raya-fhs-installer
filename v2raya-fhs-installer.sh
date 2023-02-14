@@ -139,30 +139,17 @@ Install_Service(){
 }
 
 Install_v2ray(){
-    if [[ $(uname) == 'Linux' ]]; then
-    case "$(uname -m)" in
-      'i386' | 'i686')
-        ARCH='32'
-        ;;
-      'amd64' | 'x86_64')
-        ARCH='64'
-        ;;
-      'armv7' | 'armv7l')
-        ARCH='arm32-v7a'
-        ;;
-      'armv8' | 'aarch64')
-        ARCH='arm64-v8a'
-        ;;
-      *)
-        echo "error: The architecture is not supported."
-        exit 1
-        ;;
-    esac
-    fi
-    v2ray_latest_tag="$(curl -s https://api.github.com/repos/v2fly/v2ray-core/releases/latest | grep "tag_name" | awk -F '"' '{print $4}')"
     v2ray_current_tag="v""$(/usr/local/bin/v2ray version | grep V2Ray | awk '{print $2}')"
-    if [ "$v2ray_latest_tag" != "$v2ray_current_tag" ]; then
+    v2ray_latest_tag="$(curl -s https://api.github.com/repos/v2fly/v2ray-core/releases/latest | grep "tag_name" | awk -F '"' '{print $4}')"
+    if [ $1 == "--use-mirror" ]; then
+        v2ray_latest_url="https://hubmirror.v2raya.org/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
+        elif [ $1 == "--use-ghproxy" ]; then
+        v2ray_latest_url="https://ghproxy.com/https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
+        else
         v2ray_latest_url="https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
+    fi
+    if [ "$v2ray_latest_tag" != "$v2ray_current_tag" ]; then
+        echo "Installing v2ray..."
         v2ray_latest_hash="$(curl -sL $v2ray_latest_url.dgst | awk -F '= ' '/256=/ {print $2}')"
         curl --progress-bar -L -H "Cache-Control: no-cache" -o "/tmp/v2ray.zip" "$v2ray_latest_url"
         v2ray_local_hash="$(sha256sum /tmp/v2ray.zip | awk '{print $1}')"
@@ -181,6 +168,45 @@ Install_v2ray(){
     rm -rf /tmp/v2ray /tmp/v2ray.zip
     echo "v2ray installation completed."
     fi
+}
+
+Install_v2raya(){
+    PID_of_v2rayA=$(pidof v2raya)
+    echo -e "${GREEN}Downloading v2rayA for $MACHINE${RESET}"
+    echo -e "${GREEN}Downloading from $URL${RESET}"
+    curl --progress-bar -L -o /tmp/v2raya_temp $URL
+    # if [ "$Local_SHA256" != "$Remote_SHA256" ]; then
+    #     echo "v2rayA SHA256 mismatch!"
+    #     echo "Expected: $Remote_SHA256"
+    #     echo "Actual: $Local_SHA256"
+    #     echo "Please try again."
+    #     exit 1
+    # fi
+    echo -e "${GREEN}Installing v2rayA${RESET}"
+    if [ ! -d "/usr/local/bin" ]; then
+        mkdir -p "/usr/local/bin"
+    fi
+    if [ ! -d "/usr/local/etc/v2raya" ]; then
+        mkdir -p "/usr/local/etc/v2raya"
+    fi
+    Stop_Service
+    cp /tmp/v2raya_temp /usr/local/bin/v2raya
+    chmod +x /usr/local/bin/v2raya
+    if command -v v2ray > /dev/null 2>&1; then
+            if [ ! -f /usr/local/bin/v2ray]; then
+                echo -e "${GREEN}v2ray has already installed, skip install v2ray core.${RESET}"
+            else
+                Install_v2ray
+            fi
+        else
+        echo "Installing v2ray..."
+        Install_v2ray
+    fi
+    Install_v2ray
+    Install_Service
+    Start_Service
+    echo -e "${GREEN}v2rayA installed successfully!${RESET}"
+    rm -f /tmp/v2raya_temp
 }
 
 ## Check curl
@@ -220,15 +246,19 @@ if [[ $(uname) == 'Linux' ]]; then
 case "$(uname -m)" in
       'i386' | 'i686')
         MACHINE='x86'
+        ARCH='32'
         ;;
       'amd64' | 'x86_64')
         MACHINE='x64'
+        ARCH='64'
         ;;
       'armv7' | 'armv7l')
         MACHINE='arm'
+        ARCH='arm32-v7a'
         ;;
       'armv8' | 'aarch64')
         MACHINE='arm64'
+        ARCH='arm64-v8a'
         ;;
       *)
         echo "error: The architecture is not supported."
@@ -244,51 +274,4 @@ else
     echo "https://github.com/v2rayA/v2raya-scoop"
     exit 1
 fi
-if [ "$1" == '--use-ghproxy' ]; then
-    URL="https://ghproxy.com/$GitHub_Release_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
-elif [ "$1" == '--use-mirror' ]; then
-    URL="$v2rayA_mirror_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
-else
-    URL="$GitHub_Release_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
-fi
-# Local_SHA256=$(sha256sum /tmp/v2raya_temp | awk '{printf $1}')
-# Remote_SHA256=$(curl -sL $URL.sha256.txt)
-
-## Installation
-PID_of_v2rayA=$(pidof v2raya)
-echo -e "${GREEN}Downloading v2rayA for $MACHINE${RESET}"
-echo -e "${GREEN}Downloading from $URL${RESET}"
-curl --progress-bar -L -o /tmp/v2raya_temp $URL
-# if [ "$Local_SHA256" != "$Remote_SHA256" ]; then
-#     echo "v2rayA SHA256 mismatch!"
-#     echo "Expected: $Remote_SHA256"
-#     echo "Actual: $Local_SHA256"
-#     echo "Please try again."
-#     exit 1
-# fi
-echo -e "${GREEN}Installing v2rayA${RESET}"
-if [ ! -d "/usr/local/bin" ]; then
-    mkdir -p "/usr/local/bin"
-fi
-if [ ! -d "/usr/local/etc/v2raya" ]; then
-    mkdir -p "/usr/local/etc/v2raya"
-fi
-Stop_Service
-cp /tmp/v2raya_temp /usr/local/bin/v2raya
-chmod +x /usr/local/bin/v2raya
-if command -v v2ray > /dev/null 2>&1; then
-        if [ ! -f /usr/local/bin/v2ray]; then
-            echo -e "${GREEN}v2ray has already installed, skip install v2ray core.${RESET}"
-        else
-            echo "Installing v2ray..."
-            Install_v2ray
-        fi
-    else
-    echo "Installing v2ray..."
-    Install_v2ray
-fi
-Install_v2ray
-Install_Service
-Start_Service
-echo -e "${GREEN}v2rayA installed successfully!${RESET}"
-rm -f /tmp/v2raya_temp
+Install_v2raya

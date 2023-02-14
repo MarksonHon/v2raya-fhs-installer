@@ -170,9 +170,9 @@ Install_v2ray(){
     mv /tmp/v2ray/v2ray /usr/local/bin/v2ray
     chmod 755 /usr/local/bin/v2ray
     rm -rf /tmp/v2ray /tmp/v2ray.zip
-    echo "v2ray installation completed."
+    echo ${GREEN}"v2ray installation completed."${RESET}
     else
-        echo "v2ray is already the latest version."       
+    echo ${GREEN}"v2ray is already the latest version."${RESET}       
     fi
 }
 
@@ -208,7 +208,7 @@ Install_v2raya(){
     cp /tmp/v2raya_temp /usr/local/bin/v2raya
     chmod +x /usr/local/bin/v2raya
     if command -v v2ray > /dev/null 2>&1; then
-            if [ ! -f /usr/local/bin/v2ray]; then
+            if [ ! -f /usr/local/bin/v2ray ]; then
                 echo -e "${GREEN}v2ray has already installed, skip install v2ray core.${RESET}"
             else
                 Install_v2ray
@@ -311,6 +311,7 @@ if [ -f /usr/local/bin/v2raya ]; then
     echo -e "${GREEN}v2rayA is already installed, checking for updates...${RESET}" 
     if [ "$(/usr/local/bin/v2raya --version)" == "$Latest_version" ]; then
         echo -e "${GREEN}v2rayA is already the latest version.${RESET}"
+        Install_v2ray
         exit 0
     else
     Install_v2raya

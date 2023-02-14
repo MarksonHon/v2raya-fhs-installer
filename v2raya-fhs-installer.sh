@@ -160,8 +160,8 @@ Install_v2ray{
     esac
     fi
     v2ray_latest_tag="$(curl -s https://api.github.com/repos/v2fly/v2ray-core/releases/latest | grep "tag_name" | awk -F '"' '{print $4}')"
-    v2ray_current_tag="v$(/usr/local/bin/v2ray version | grep V2Ray | awk '{print $2}')"
-    if [  "$v2ray_latest_tag" != "$v2ray_current_tag" ]; then
+    v2ray_current_tag="v""$(/usr/local/bin/v2ray version | grep V2Ray | awk '{print $2}')"
+    if [ "$v2ray_latest_tag" != "$v2ray_current_tag" ]; then
         v2ray_latest_url="https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
         v2ray_latest_hash="$(curl -sL $v2ray_latest_url.dgst | awk -F '= ' '/256=/ {print $2}')"
         curl --progress-bar -L -H "Cache-Control: no-cache" -o "/tmp/v2ray.zip" "$v2ray_latest_url"

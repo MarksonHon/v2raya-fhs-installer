@@ -171,6 +171,8 @@ Install_v2ray(){
     chmod 755 /usr/local/bin/v2ray
     rm -rf /tmp/v2ray /tmp/v2ray.zip
     echo "v2ray installation completed."
+    else
+        echo "v2ray is already the latest version."       
     fi
 }
 
@@ -212,7 +214,6 @@ Install_v2raya(){
                 Install_v2ray
             fi
         else
-        echo "Installing v2ray..."
         Install_v2ray
     fi
     Install_Service
@@ -306,9 +307,14 @@ else
     echo "https://github.com/v2rayA/v2raya-scoop"
     exit 1
 fi
-if [ "$(/usr/local/bin/v2raya --version)" == "$Latest_version" ]; then
-    echo -e "${GREEN}v2rayA is already the latest version.${RESET}"
-    exit 0
+if [ -f /usr/local/bin/v2raya ]; then
+    echo -e "${GREEN}v2rayA is already installed, checking for updates...${RESET}" 
+    if [ "$(/usr/local/bin/v2raya --version)" == "$Latest_version" ]; then
+        echo -e "${GREEN}v2rayA is already the latest version.${RESET}"
+        exit 0
+    else
+    Install_v2raya
+    fi
 else
-Install_v2raya
+    Install_v2raya
 fi

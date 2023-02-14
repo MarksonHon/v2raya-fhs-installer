@@ -138,7 +138,7 @@ Install_Service(){
     fi
 }
 
-Install_v2ray{
+Install_v2ray(){
     if [[ $(uname) == 'Linux' ]]; then
     case "$(uname -m)" in
       'i386' | 'i686')

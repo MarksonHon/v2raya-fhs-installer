@@ -141,6 +141,7 @@ Install_Service(){
 Install_v2ray(){
     if [ -f /usr/local/bin/v2ray ]; then
         v2ray_current_tag="v""$(/usr/local/bin/v2ray version | grep V2Ray | awk '{print $2}')"
+        echo ${GREEN}"v2ray core is already installed, checking for updates..."${RESET}
     else
         v2ray_current_tag="v0.0.0"
     fi
@@ -153,7 +154,7 @@ Install_v2ray(){
         v2ray_latest_url="https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
     fi
     if [ "$v2ray_latest_tag" != "$v2ray_current_tag" ]; then
-        echo "Installing v2ray..."
+        echo "Installing v2ray core..."
         v2ray_latest_hash="$(curl -sL $v2ray_latest_url.dgst | awk -F '= ' '/256=/ {print $2}')"
         curl --progress-bar -L -H "Cache-Control: no-cache" -o "/tmp/v2ray.zip" "$v2ray_latest_url"
         v2ray_local_hash="$(sha256sum /tmp/v2ray.zip | awk '{print $1}')"
@@ -170,9 +171,9 @@ Install_v2ray(){
     mv /tmp/v2ray/v2ray /usr/local/bin/v2ray
     chmod 755 /usr/local/bin/v2ray
     rm -rf /tmp/v2ray /tmp/v2ray.zip
-    echo ${GREEN}"v2ray installation completed."${RESET}
+    echo ${GREEN}"v2ray core installation completed."${RESET}
     else
-    echo ${GREEN}"v2ray is already the latest version."${RESET}       
+    echo ${GREEN}"v2ray core is already the latest version."${RESET}       
     fi
 }
 

@@ -30,7 +30,7 @@ ExecStart=/usr/local/bin/v2raya
 Restart=on-failure
 
 [Install]
-    WantedBy=multi-user.target" > /etc/systemd/system/v2raya.service
+WantedBy=multi-user.target" > /etc/systemd/system/v2raya.service
 if [ ! -d "$ServiceConf" ]; then
     echo "Marking $ServiceConf"
     mkdir -p $ServiceConf

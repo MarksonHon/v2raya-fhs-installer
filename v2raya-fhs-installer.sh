@@ -139,10 +139,29 @@ Install_Service(){
 }
 
 Install_v2ray{
+    if [[ $(uname) == 'Linux' ]]; then
+    case "$(uname -m)" in
+      'i386' | 'i686')
+        ARCH='32'
+        ;;
+      'amd64' | 'x86_64')
+        ARCH='64'
+        ;;
+      'armv7' | 'armv7l')
+        ARCH='arm32-v7a'
+        ;;
+      'armv8' | 'aarch64')
+        ARCH='arm64-v8a'
+        ;;
+      *)
+        echo "error: The architecture is not supported."
+        exit 1
+        ;;
+    esac
     v2ray_latest_tag="$(curl -s https://api.github.com/repos/v2fly/v2ray-core/releases/latest | grep "tag_name" | awk -F '"' '{print $4}')"
     v2ray_current_tag="v$(/usr/local/bin/v2ray version | grep V2Ray | awk '{print $2}')"
     if [  "$v2ray_latest_tag" != "$v2ray_current_tag" ]; then
-        v2ray_latest_url="https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$MACHINE.zip"
+        v2ray_latest_url="https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
         v2ray_latest_hash="$(curl -sL $v2ray_latest_url.dgst | awk -F '= ' '/256=/ {print $2}')"
         curl --progress-bar -L -H "Cache-Control: no-cache" -o "/tmp/v2ray.zip" "$v2ray_latest_url"
         v2ray_local_hash="$(sha256sum /tmp/v2ray.zip | awk '{print $1}')"

@@ -139,7 +139,7 @@ Install_Service(){
 }
 
 Install_v2ray(){
-    if [ -f /usr/local/bin/v2ray]; then
+    if [ -f /usr/local/bin/v2ray ]; then
         v2ray_current_tag="v""$(/usr/local/bin/v2ray version | grep V2Ray | awk '{print $2}')"
     else
         v2ray_current_tag="v0.0.0"
@@ -215,7 +215,6 @@ Install_v2raya(){
         echo "Installing v2ray..."
         Install_v2ray
     fi
-    Install_v2ray
     Install_Service
     Start_Service
     echo -e "${GREEN}v2rayA installed successfully!${RESET}"
@@ -238,6 +237,26 @@ if ! command -v curl > /dev/null 2>&1; then
     apk add curl
     else
     echo "curl not installed, stop installation, please install curl and try again!"
+    exit 1
+    fi
+fi
+
+## Check unzip
+if ! command -v unzip > /dev/null 2>&1; then
+    if command -v apt > /dev/null 2>&1; then
+    apt update; apt install unzip -y
+    elif command -v dnf > /dev/null 2>&1; then
+    dnf install unzip -y
+    elif command -v yum > /dev/null  2>&1; then
+    yum install unzip -y
+    elif command -v zypper > /dev/null 2>&1; then
+    zypper install --non-interactive unzip
+    elif command -v pacman > /dev/null 2>&1; then
+    pacman -S unzip --noconfirm
+    elif command -v apk > /dev/null 2>&1; then
+    apk add unzip
+    else
+    echo "unzip not installed, stop installation, please install unzip and try again!"
     exit 1
     fi
 fi

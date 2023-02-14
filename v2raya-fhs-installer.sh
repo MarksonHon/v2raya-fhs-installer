@@ -139,7 +139,10 @@ Install_Service(){
 }
 
 Install_v2ray(){
-    if [ -f /usr/local/bin/v2ray ]; then
+    if [ -f /usr/bin/v2ray ]; then
+        echo "v2ray is already installed by your package manager, skipping..."
+        return
+    elif [ -f /usr/local/bin/v2ray ]; then
         v2ray_current_tag="v""$(/usr/local/bin/v2ray version | grep V2Ray | awk '{print $2}')"
         echo ${GREEN}"v2ray core is already installed, checking for updates..."${RESET}
     else

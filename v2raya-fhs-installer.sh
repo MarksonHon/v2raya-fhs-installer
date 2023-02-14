@@ -223,6 +223,15 @@ Install_v2raya(){
     rm -f /tmp/v2raya_temp
 }
 
+
+## Don't install on OpenWrt
+if [ -f /etc/openwrt_release ]; then
+    echo "OpenWrt is not supported by this script, please"
+    echo "install v2rayA for OpenWrt from this link: "
+    echo "https://github.com/v2rayA/v2rayA-openwrt"
+    exit 1
+fi
+
 ## Check curl
 if ! command -v curl > /dev/null 2>&1; then
     if command -v apt > /dev/null 2>&1; then
@@ -261,14 +270,6 @@ if ! command -v unzip > /dev/null 2>&1; then
     echo "unzip not installed, stop installation, please install unzip and try again!"
     exit 1
     fi
-fi
-
-## Don't install on OpenWrt
-if [ -f /etc/openwrt_release ]; then
-    echo "OpenWrt is not supported, please install"
-    echo "v2rayA from v2rayA for OpenWrt: "
-    echo "https://github.com/v2rayA/v2rayA-openwrt"
-    exit 1
 fi
 
 ## Check URL

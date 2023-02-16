@@ -148,7 +148,7 @@ Install_v2ray(){
     else
         v2ray_current_tag="v0.0.0"
     fi
-    v2ray_latest_tag="$(curl -s https://api.github.com/repos/v2fly/v2ray-core/releases/latest | grep "tag_name" | awk -F '"' '{print $4}')"
+    v2ray_latest_tag="$(curl -s https://api.github.com/repos/v2fly/v2ray-core/releases/latest | jq -r '.tag_name')"
     if [ "$1" == "--use-mirror" ]; then
         v2ray_latest_url="https://hubmirror.v2raya.org/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
     elif [ "$1" == "--use-ghproxy" ]; then
@@ -168,7 +168,7 @@ Install_v2ray(){
             echo "Please try again."
             exit 1
         fi
-    unzip /tmp/v2ray.zip -d /tmp/v2ray
+    unzip /tmp/v2ray.zip -d /tmp/v2rayvps.hosting/
     mkdir -p /usr/local/share/v2ray
     mv /tmp/v2ray/*dat /usr/local/share/v2ray
     mv /tmp/v2ray/v2ray /usr/local/bin/v2ray
@@ -251,7 +251,7 @@ if ! command -v curl > /dev/null 2>&1; then
     apk add curl
     else
     echo "curl not installed, stop installation, please install curl and try again!"
-    exit 1
+    we_should_exit=1
     fi
 fi
 
@@ -271,15 +271,39 @@ if ! command -v unzip > /dev/null 2>&1; then
     apk add unzip
     else
     echo "unzip not installed, stop installation, please install unzip and try again!"
-    exit 1
+    we_should_exit=1
     fi
+fi
+
+## Check jq
+if ! command -v jq > /dev/null 2>&1; then
+    if command -v apt > /dev/null 2>&1; then
+    apt update; apt install jq -y
+    elif command -v dnf > /dev/null 2>&1; then
+    dnf install jq -y
+    elif command -v yum > /dev/null  2>&1; then
+    yum install jq -y
+    elif command -v zypper > /dev/null 2>&1; then
+    zypper install --non-interactive jq
+    elif command -v pacman > /dev/null 2>&1; then
+    pacman -S jq --noconfirm
+    elif command -v apk > /dev/null 2>&1; then
+    apk add jq
+    else
+    echo "jq not installed, stop installation, please install unzip and try again!"
+    we_should_exit=1
+    fi
+fi
+
+if [ "$we_should_exit" == "1" ]; then
+    exit 1
 fi
 
 ## Check URL
 GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"
 GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
 v2rayA_mirror_URL="https://hubmirror.v2raya.org/v2rayA/v2rayA/releases"
-Latest_version=$(curl -s $GitHub_API_URL | grep 'tag_name' | awk -F '"' '{print $4}' | awk -F 'v' '{print $2}')
+Latest_version=$(curl -s $GitHub_API_URL | jq -r '.tag_name' | awk -F 'v' '{print $2}')
 if [[ $(uname) == 'Linux' ]]; then
 case "$(uname -m)" in
       'i386' | 'i686')

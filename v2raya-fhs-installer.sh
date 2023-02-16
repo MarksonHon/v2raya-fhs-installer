@@ -235,65 +235,27 @@ if [ -f /etc/openwrt_release ]; then
     exit 1
 fi
 
-## Check curl
-if ! command -v curl > /dev/null 2>&1; then
-    if command -v apt > /dev/null 2>&1; then
-    apt update; apt install curl -y
-    elif command -v dnf > /dev/null 2>&1; then
-    dnf install curl -y
-    elif command -v yum > /dev/null  2>&1; then
-    yum install curl -y
-    elif command -v zypper > /dev/null 2>&1; then
-    zypper install --non-interactive curl
-    elif command -v pacman > /dev/null 2>&1; then
-    pacman -S curl --noconfirm
-    elif command -v apk > /dev/null 2>&1; then
-    apk add curl
-    else
-    echo "curl not installed, stop installation, please install curl and try again!"
-    we_should_exit=1
+## Check curl, unzip, jq
+for tool_need in curl unzip jq; do
+    if ! command -v $tool_need > /dev/null 2>&1; then
+        if command -v apt > /dev/null 2>&1; then
+        apt update; apt install $tool_need -y
+        elif command -v dnf > /dev/null 2>&1; then
+        dnf install $tool_need -y
+        elif command -v yum > /dev/null  2>&1; then
+        yum install $tool_need -y
+        elif command -v zypper > /dev/null 2>&1; then
+        zypper install --non-interactive $tool_need
+        elif command -v pacman > /dev/null 2>&1; then
+        pacman -S $tool_need --noconfirm
+        elif command -v apk > /dev/null 2>&1; then
+        apk add $tool_need
+        else
+        echo "$tool_need not installed, stop installation, please install $tool_need and try again!"
+        we_should_exit=1
+        fi
     fi
-fi
-
-## Check unzip
-if ! command -v unzip > /dev/null 2>&1; then
-    if command -v apt > /dev/null 2>&1; then
-    apt update; apt install unzip -y
-    elif command -v dnf > /dev/null 2>&1; then
-    dnf install unzip -y
-    elif command -v yum > /dev/null  2>&1; then
-    yum install unzip -y
-    elif command -v zypper > /dev/null 2>&1; then
-    zypper install --non-interactive unzip
-    elif command -v pacman > /dev/null 2>&1; then
-    pacman -S unzip --noconfirm
-    elif command -v apk > /dev/null 2>&1; then
-    apk add unzip
-    else
-    echo "unzip not installed, stop installation, please install unzip and try again!"
-    we_should_exit=1
-    fi
-fi
-
-## Check jq
-if ! command -v jq > /dev/null 2>&1; then
-    if command -v apt > /dev/null 2>&1; then
-    apt update; apt install jq -y
-    elif command -v dnf > /dev/null 2>&1; then
-    dnf install jq -y
-    elif command -v yum > /dev/null  2>&1; then
-    yum install jq -y
-    elif command -v zypper > /dev/null 2>&1; then
-    zypper install --non-interactive jq
-    elif command -v pacman > /dev/null 2>&1; then
-    pacman -S jq --noconfirm
-    elif command -v apk > /dev/null 2>&1; then
-    apk add jq
-    else
-    echo "jq not installed, stop installation, please install unzip and try again!"
-    we_should_exit=1
-    fi
-fi
+done
 
 if [ "$we_should_exit" == "1" ]; then
     exit 1

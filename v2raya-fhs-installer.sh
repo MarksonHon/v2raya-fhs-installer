@@ -168,7 +168,7 @@ Install_v2ray(){
             echo "Please try again."
             exit 1
         fi
-    unzip /tmp/v2ray.zip -d /tmp/v2rayvps.hosting/
+    unzip /tmp/v2ray.zip -d /tmp/v2ray/
     mkdir -p /usr/local/share/v2ray
     mv /tmp/v2ray/*dat /usr/local/share/v2ray
     mv /tmp/v2ray/v2ray /usr/local/bin/v2ray

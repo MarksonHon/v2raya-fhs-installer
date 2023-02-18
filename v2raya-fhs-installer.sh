@@ -169,7 +169,9 @@ Install_v2ray(){
             exit 1
         fi
     unzip /tmp/v2ray.zip -d /tmp/v2ray/
-    mkdir -p /usr/local/share/v2ray
+    if [ ! -d /usr/local/share/v2ray ]; then
+        mkdir -p /usr/local/share/v2ray
+    fi
     mv /tmp/v2ray/*dat /usr/local/share/v2ray
     mv /tmp/v2ray/v2ray /usr/local/bin/v2ray
     chmod 755 /usr/local/bin/v2ray

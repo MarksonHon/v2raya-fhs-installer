@@ -215,7 +215,7 @@ Install_v2raya(){
     chmod +x /usr/local/bin/v2raya
     if command -v v2ray > /dev/null 2>&1; then
             if [ ! -f /usr/local/bin/v2ray ]; then
-                echo -e "${GREEN}v2ray has already installed, skip install v2ray core.${RESET}"
+                echo -e "${GREEN}v2ray is already installed by your package manager, skipping...${RESET}"
             else
                 Install_v2ray
             fi
@@ -229,11 +229,17 @@ Install_v2raya(){
 }
 
 
-## Don't install on OpenWrt
+## Don't install on OpenWrt or Android
 if [ -f /etc/openwrt_release ]; then
     echo "OpenWrt is not supported by this script, please"
     echo "install v2rayA for OpenWrt from this link: "
     echo "https://github.com/v2rayA/v2rayA-openwrt"
+    exit 1
+fi
+
+if [ -f /system/build.prop ] || [ $(uname -o) == "Android" ]; then
+    echo "Android is not supported by v2rayA!"
+    echo "Please use SagerNet, v2rayNG or v2ray_for_Magisk instead."
     exit 1
 fi
 

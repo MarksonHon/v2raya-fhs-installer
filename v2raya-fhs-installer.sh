@@ -149,7 +149,9 @@ Install_v2ray(){
         v2ray_current_tag="v0.0.0"
     fi
     if [ "$v2ray_latest_tag" != "$v2ray_current_tag" ]; then
-        echo "Installing v2ray core..."
+        echo ${GREEN}"Installing v2ray core..."${RESET}
+        echo ${GREEN}"Downloading v2ray core..."${RESET}
+        echo ${GREEN}"Downloading from $v2ray_latest_url"${RESET}
         v2ray_latest_hash="$(curl -sL $v2ray_latest_url.dgst | awk -F '= ' '/256=/ {print $2}')"
         curl --progress-bar -L -H "Cache-Control: no-cache" -o "/tmp/v2ray.zip" "$v2ray_latest_url"
         v2ray_local_hash="$(sha256sum /tmp/v2ray.zip | awk '{print $1}')"
@@ -160,9 +162,14 @@ Install_v2ray(){
             echo "Please try again."
             exit 1
         fi
-    unzip /tmp/v2ray.zip -d /tmp/v2ray/
+    ${YELLOW}unzip /tmp/v2ray.zip -d /tmp/v2ray/${RESET}
     if [ ! -d /usr/local/share/v2ray ]; then
         mkdir -p /usr/local/share/v2ray
+        else
+        rm /usr/local/share/v2ray/*dat
+    fi
+    if [ -f /usr/local/bin/v2ray ]; then
+        rm /usr/local/bin/v2ray
     fi
     mv /tmp/v2ray/*dat /usr/local/share/v2ray
     mv /tmp/v2ray/v2ray /usr/local/bin/v2ray
@@ -254,28 +261,7 @@ if [ "$we_should_exit" == "1" ]; then
     exit 1
 fi
 
-## Check URL
-GitHub_API_URL="https://api.github.com/repos/v2rayA/v2rayA/releases/latest"
-GitHub_Release_URL="https://github.com/v2rayA/v2rayA/releases"
-v2rayA_mirror_URL="https://hubmirror.v2raya.org/v2rayA/v2rayA/releases"
-Latest_version=$(curl -s $GitHub_API_URL | jq -r '.tag_name' | awk -F 'v' '{print $2}')
-if [ "$1" == '--use-ghproxy' ]; then
-    URL="https://ghproxy.com/$GitHub_Release_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
-elif [ "$1" == '--use-mirror' ]; then
-    URL="$v2rayA_mirror_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
-else
-    URL="$GitHub_Release_URL/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
-fi
-
-v2ray_latest_tag="$(curl -s https://api.github.com/repos/v2fly/v2ray-core/releases/latest | jq -r '.tag_name')"
-if [ "$1" == "--use-mirror" ]; then
-    v2ray_latest_url="https://hubmirror.v2raya.org/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
-elif [ "$1" == "--use-ghproxy" ]; then
-    v2ray_latest_url="https://ghproxy.com/https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
-else
-    v2ray_latest_url="https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
-fi
-
+## Check Arch and OS
 if [[ $(uname) == 'Linux' ]]; then
 case "$(uname -m)" in
       'i386' | 'i686')
@@ -308,6 +294,26 @@ else
     echo "https://github.com/v2rayA/v2raya-scoop"
     exit 1
 fi
+
+## Check URL
+Latest_version=$(curl -s https://api.github.com/repos/v2rayA/v2rayA/releases/latest | jq -r '.tag_name' | awk -F 'v' '{print $2}')
+if [ "$1" == '--use-ghproxy' ]; then
+    URL="https://ghproxy.com/https://github.com/v2rayA/v2rayA/releases/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
+elif [ "$1" == '--use-mirror' ]; then
+    URL="https://hubmirror.v2raya.org/v2rayA/v2rayA/releases/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
+else
+    URL="https://github.com/v2rayA/v2rayA/releases/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
+fi
+
+v2ray_latest_tag="$(curl -s https://api.github.com/repos/v2fly/v2ray-core/releases/latest | jq -r '.tag_name')"
+if [ "$1" == "--use-mirror" ]; then
+    v2ray_latest_url="https://hubmirror.v2raya.org/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
+elif [ "$1" == "--use-ghproxy" ]; then
+    v2ray_latest_url="https://ghproxy.com/https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
+else
+    v2ray_latest_url="https://github.com/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
+fi
+
 if [ -f /usr/local/bin/v2raya ]; then
     echo -e "${GREEN}v2rayA is already installed, checking for updates...${RESET}" 
     if [ "$(/usr/local/bin/v2raya --version)" == "$Latest_version" ]; then

@@ -149,7 +149,6 @@ Install_v2ray(){
         v2ray_current_tag="v0.0.0"
     fi
     if [ "$v2ray_latest_tag" != "$v2ray_current_tag" ]; then
-        echo ${GREEN}"Installing v2ray core..."${RESET}
         echo ${GREEN}"Downloading v2ray core..."${RESET}
         echo ${GREEN}"Downloading from $v2ray_latest_url"${RESET}
         v2ray_latest_hash="$(curl -sL $v2ray_latest_url.dgst | awk -F '= ' '/256=/ {print $2}')"
@@ -162,11 +161,14 @@ Install_v2ray(){
             echo "Please try again."
             exit 1
         fi
-    ${YELLOW}unzip /tmp/v2ray.zip -d /tmp/v2ray/${RESET}
+    echo ${GREEN}"Installing v2ray core..."${RESET}
+    echo ${YELLOW}```unzip /tmp/v2ray.zip -d /tmp/v2ray/```${RESET}
     if [ ! -d /usr/local/share/v2ray ]; then
         mkdir -p /usr/local/share/v2ray
-        else
-        rm /usr/local/share/v2ray/*dat
+    else
+        if [ -f /usr/local/share/v2ray/geoip.dat ]; then
+             rm /usr/local/share/v2ray/*dat
+        fi
     fi
     if [ -f /usr/local/bin/v2ray ]; then
         rm /usr/local/bin/v2ray

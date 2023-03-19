@@ -184,19 +184,19 @@ Install_v2ray(){
 }
 
 Install_v2raya(){
-    # Local_SHA256="$(sha256sum /tmp/v2raya_temp | awk '{print $1}')"
-    # Remote_SHA256="$(curl -sL $URL.sha256.txt)"
+    Local_SHA256="$(sha256sum /tmp/v2raya_temp | awk '{print $1}')"
+    Remote_SHA256="$(curl -sL $URL.sha256.txt)"
     PID_of_v2rayA=$(pidof v2raya)
     echo -e "${GREEN}Downloading v2rayA for $MACHINE${RESET}"
     echo -e "${GREEN}Downloading from $URL${RESET}"
     curl --progress-bar -L -o /tmp/v2raya_temp $URL
-    # if [ "$Local_SHA256" != "$Remote_SHA256" ]; then
-    #     echo "v2rayA SHA256 mismatch!"
-    #     echo "Expected: $Remote_SHA256"
-    #     echo "Actual: $Local_SHA256"
-    #     echo "Please try again."
-    #     exit 1
-    # fi
+    if [ "$Local_SHA256" != "$Remote_SHA256" ]; then
+        echo "v2rayA SHA256 mismatch!"
+        echo "Expected: $Remote_SHA256"
+        echo "Actual: $Local_SHA256"
+        echo "Please try again."
+        exit 1
+    fi
     echo -e "${GREEN}Installing v2rayA${RESET}"
     if [ ! -d "/usr/local/bin" ]; then
         mkdir -p "/usr/local/bin"
@@ -298,7 +298,7 @@ else
 fi
 
 ## Check URL
-Latest_version=$(curl -s https://api.github.com/repos/v2rayA/v2rayA/releases/latest | jq -r '.tag_name' | awk -F 'v' '{print $2}')
+Latest_version=$(curl -s https://api.github.com/repos/v2rayA/v2rayA/tags | jq -r ".[]" |  jq -r '.name' | awk 'NR==1 {print; exit}' | awk -F 'v' '{print $2}')
 if [ "$1" == '--use-ghproxy' ]; then
     URL="https://ghproxy.com/https://github.com/v2rayA/v2rayA/releases/download/v$Latest_version/v2raya_linux_""$MACHINE"'_'"$Latest_version"
 elif [ "$1" == '--use-mirror' ]; then

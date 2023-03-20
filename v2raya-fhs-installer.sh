@@ -184,12 +184,12 @@ Install_v2ray(){
 }
 
 Install_v2raya(){
-    Local_SHA256="$(sha256sum /tmp/v2raya_temp | awk '{print $1}')"
     Remote_SHA256="$(curl -sL $URL.sha256.txt)"
     PID_of_v2rayA=$(pidof v2raya)
     echo -e "${GREEN}Downloading v2rayA for $MACHINE${RESET}"
     echo -e "${GREEN}Downloading from $URL${RESET}"
     curl --progress-bar -L -o /tmp/v2raya_temp $URL
+    Local_SHA256="$(sha256sum /tmp/v2raya_temp | awk '{print $1}')"
     if [ "$Local_SHA256" != "$Remote_SHA256" ]; then
         echo "v2rayA SHA256 mismatch!"
         echo "Expected: $Remote_SHA256"

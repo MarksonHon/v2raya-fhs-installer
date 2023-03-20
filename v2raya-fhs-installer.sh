@@ -207,6 +207,10 @@ Install_v2raya(){
     Stop_Service
     cp /tmp/v2raya_temp /usr/local/bin/v2raya
     chmod +x /usr/local/bin/v2raya
+    Install_Service
+    Start_Service
+    echo -e "${GREEN}v2rayA installed successfully!${RESET}"
+    rm -f /tmp/v2raya_temp
     if command -v v2ray > /dev/null 2>&1; then
             if [ ! -f /usr/local/bin/v2ray ]; then
                 echo -e "${GREEN}v2ray is already installed by your package manager, skipping...${RESET}"
@@ -215,11 +219,9 @@ Install_v2raya(){
             fi
         else
         Install_v2ray
+        Stop_Service
+        Start_Service
     fi
-    Install_Service
-    Start_Service
-    echo -e "${GREEN}v2rayA installed successfully!${RESET}"
-    rm -f /tmp/v2raya_temp
 }
 
 

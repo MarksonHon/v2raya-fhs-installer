@@ -289,7 +289,7 @@ start_pre() {
 }
 ## Stop service while in installation
 stop_v2raya(){
-    if [ "$(systemctl is-active v2raya)" == "active" ]; then
+    if [ -f /usr/lib/systemd/systemd ] && [ "$(systemctl is-active v2raya)" == "active" ]; then
         echo "${GREEN}Stopping v2raya...${RESET}"
         systemctl stop v2raya
         v2raya_stopped=yes

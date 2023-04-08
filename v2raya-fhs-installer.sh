@@ -125,19 +125,19 @@ else
 fi
 ## v2rayA
 get_v2raya_url(){
-    v2raya_latest_tag=$(curl -s https://api.github.com/repos/v2rayA/v2rayA/tags | jq -r ".[]" |  jq -r '.name' | awk 'NR==1 {print; exit}' | awk -F 'v' '{print $2}')
+    v2raya_latest_tag=$(curl -H "Cache-Control: no-cache" -s https://api.github.com/repos/v2rayA/v2rayA/tags | jq -r ".[]" |  jq -r '.name' | awk 'NR==1 {print; exit}' | awk -F 'v' '{print $2}')
     v2raya_download_url="$base_url"'/v2rayA/v2rayA/releases/download/v'"$v2raya_latest_tag""/v2raya_linux_""$MACHINE"'_'"$v2raya_latest_tag"
     v2raya_hash_url="$v2raya_download_url"'.sha256.txt'
 }
 ## v2ray core
 get_v2ray_url(){
-    v2ray_latest_tag=$(curl -s https://api.github.com/repos/v2fly/v2ray-core/tags | jq -r ".[]" |  jq -r '.name' | awk 'NR==1 {print; exit}' | awk -F 'v' '{print $2}')
+    v2ray_latest_tag=$(curl -H "Cache-Control: no-cache" -s https://api.github.com/repos/v2fly/v2ray-core/tags | jq -r ".[]" |  jq -r '.name' | awk 'NR==1 {print; exit}' | awk -F 'v' '{print $2}')
     v2ray_download_url="$base_url""/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
     v2ray_hash_url="$v2ray_download_url"'.dgst'
 }
 ## xray core
 get_xray_url(){
-    xray_latest_tag=$(curl -s https://api.github.com/repos/XTLS/xray-core/tags | jq -r ".[]" |  jq -r '.name' | awk 'NR==1 {print; exit}' | awk -F 'v' '{print $2}')
+    xray_latest_tag=$(curl -H "Cache-Control: no-cache" -s https://api.github.com/repos/XTLS/xray-core/tags | jq -r ".[]" |  jq -r '.name' | awk 'NR==1 {print; exit}' | awk -F 'v' '{print $2}')
     xray_download_url="https://github.com/XTLS/xray-core/releases/download/$xray_latest_tag/v2ray-linux-$ARCH.zip"
     xray_hash_url="$xray_download_url"'.dgst'
 }
@@ -146,11 +146,11 @@ get_xray_url(){
 ## v2rayA
 download_v2raya(){
     echo "${GREEN}""Downloading v2rayA...""${RESET}"
-    if ! curl --progress-bar -L "$v2raya_download_url" --output ./v2raya_bin; then
+    if ! curl -H "Cache-Control: no-cache" --progress-bar -L "$v2raya_download_url" --output ./v2raya_bin; then
         echo "${RED}""Download v2rayA failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
-    if ! curl --progress-bar -sL "$v2raya_hash_url" --output ./v2raya-hash; then
+    if ! curl -H "Cache-Control: no-cache" -sL "$v2raya_hash_url" --output ./v2raya-hash; then
         echo "${RED}""Download v2rayA hash failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
@@ -168,11 +168,11 @@ download_v2raya(){
 ## v2ray core
 download_v2ray(){
     echo "${GREEN}""Downloading v2ray core...""${RESET}"
-    if ! curl --progress-bar -L "$v2ray_download_url" --output ./v2ray.zip; then
+    if ! curl -H "Cache-Control: no-cache" --progress-bar -L "$v2ray_download_url" --output ./v2ray.zip; then
         echo "${RED}""Download v2ray core failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
-    if ! curl --progress-bar -sL "$v2ray_hash_url" --output ./v2ray-hash; then
+    if ! curl -H "Cache-Control: no-cache" -sL "$v2ray_hash_url" --output ./v2ray-hash; then
         echo "${RED}""Download v2ray core hash failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
@@ -189,11 +189,11 @@ download_v2ray(){
 }
 ## xray core
 download_xray(){
-    if ! curl --progress-bar -L "$xray_download_url" --output ./xray.zip; then
+    if ! curl -H "Cache-Control: no-cache" --progress-bar -L "$xray_download_url" --output ./xray.zip; then
         echo "${RED}""Download v2ray core failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
-    if ! curl --progress-bar -sL "$xray_hash_url" --output ./xray-hash; then
+    if ! curl -H "Cache-Control: no-cache" -sL "$xray_hash_url" --output ./xray-hash; then
         echo "${RED}""Download v2ray core hash failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
@@ -317,7 +317,7 @@ start_v2raya(){
 current_path=$(pwd)
 cd /tmp/ || exit
 if [ -f "$install_path"/v2raya ]; then
-    v2raya_local_version=$("$install_path"v2raya --version)
+    v2raya_local_version=v$("$install_path"v2raya --version)
 else
     v2raya_local_version="v0"
 fi

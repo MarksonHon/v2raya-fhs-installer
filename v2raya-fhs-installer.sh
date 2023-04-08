@@ -256,6 +256,7 @@ Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target" > /etc/systemd/system/v2raya.service
+    systemctl daemon-reload
     echo 'systemd service has installed to /etc/systemd/system/v2raya.service'
 }
 ## OpenRC
@@ -316,7 +317,7 @@ start_v2raya(){
 ## Main
 current_path=$(pwd)
 cd /tmp/ || exit
-if [ -f "$install_path"/v2raya ]; then
+if [ -f "$install_path"v2raya ]; then
     v2raya_local_version=v$("$install_path"v2raya --version)
 else
     v2raya_local_version="v0"

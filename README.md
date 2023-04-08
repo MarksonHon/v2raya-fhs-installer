@@ -5,12 +5,12 @@
 Install `curl` and `bash` on your system(some systems also need to install `pidof` by yourself), then run this command:
 
 ```bash
-sudo bash -c "$(curl -sL https://github.com/MarksonHon/v2raya-fhs-installer/raw/main/v2raya-fhs-installer.sh)"
+sudo bash -c "$(curl -sL -H "Cache-Control: no-cache" https://github.com/MarksonHon/v2raya-fhs-installer/raw/main/v2raya-fhs-installer.sh)"
 ```
 If you need download from mirror:
 
 ```bash
-curl -LO https://github.com/MarksonHon/v2raya-fhs-installer/raw/main/v2raya-fhs-installer.sh
+curl -LO -H "Cache-Control: no-cache" https://github.com/MarksonHon/v2raya-fhs-installer/raw/main/v2raya-fhs-installer.sh
 sudo chmod 755 v2raya-fhs-installer.sh
 sudo ./v2raya-fhs-installer.sh --use-mirror
 ```

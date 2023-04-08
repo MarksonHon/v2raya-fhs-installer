@@ -77,20 +77,26 @@ if [ -f /system/build.prop ] || [ "$(uname -o)" == "Android" ]; then
 fi
 
 ## Check args
-if [ "$1" != '--use-mirror' ] && [ "$1" != '--with-v2ray' ] && [ "$1" != '--with-v2ray' ] && [ -n "$1" ];then
+if [ "$1" != '--force' ] && [ "$1" != '--use-mirror' ] && [ "$1" != '--with-v2ray' ] && [ "$1" != '--with-xray' ] && [ -n "$1" ];then
     echo "${YELLOW}""Usage of $(pwd)/v2raya-fhs-installer.sh:""${RESET}"
     echo "--use-mirror     use v2rayA's mirror server to download (no xray core support yet)"
     echo "--with-v2ray     install v2ray core after installing v2rayA"
     echo "--with-xray      install xray core after installing v2rayA"
+    echo "--force          forcw install v2rayA even it has been installed"
     exit 1
 fi
 while [ $# != 0 ] ; do 
     if [ "$1" == '--use-mirror' ]; then
-        use_mirror=yes
-    elif [ "$1" == '--with-v2ray' ]; then
-        need_install_v2ray=yes
-    elif [ "$1" == '--with-xray' ]; then
-        need_install_xray=yes
+        use_mirror='yes'
+    fi
+    if [ "$1" == '--with-v2ray' ]; then
+        need_install_v2ray='yes'
+    fi
+    if [ "$1" == '--with-xray' ]; then
+        need_install_xray='yes'
+    fi
+    if [ "$1" == '--force' ]; then
+        force_install='yes'
     fi
     shift 
 done
@@ -134,13 +140,13 @@ get_v2raya_url(){
 ## v2ray core
 get_v2ray_url(){
     v2ray_latest_tag=$(curl -H "Cache-Control: no-cache" -s https://api.github.com/repos/v2fly/v2ray-core/tags | jq -r ".[]" |  jq -r '.name' | awk 'NR==1 {print; exit}' | awk -F 'v' '{print $2}')
-    v2ray_download_url="$base_url""/v2fly/v2ray-core/releases/download/$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
+    v2ray_download_url="$base_url""/v2fly/v2ray-core/releases/download/v$v2ray_latest_tag/v2ray-linux-$ARCH.zip"
     v2ray_hash_url="$v2ray_download_url"'.dgst'
 }
 ## xray core
 get_xray_url(){
     xray_latest_tag=$(curl -H "Cache-Control: no-cache" -s https://api.github.com/repos/XTLS/xray-core/tags | jq -r ".[]" |  jq -r '.name' | awk 'NR==1 {print; exit}' | awk -F 'v' '{print $2}')
-    xray_download_url="https://github.com/XTLS/xray-core/releases/download/$xray_latest_tag/v2ray-linux-$ARCH.zip"
+    xray_download_url="https://github.com/XTLS/xray-core/releases/download/v$xray_latest_tag/Xray-linux-$ARCH.zip"
     xray_hash_url="$xray_download_url"'.dgst'
 }
 
@@ -152,18 +158,18 @@ download_v2raya(){
         echo "${RED}""Download v2rayA failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
-    if ! curl -H "Cache-Control: no-cache" -sL "$v2raya_hash_url" --output ./v2raya-hash; then
+    if ! curl -H "Cache-Control: no-cache" -sL "$v2raya_hash_url" --output ./v2raya_hash; then
         echo "${RED}""Download v2rayA hash failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
     local_v2raya_hash=$(sha256sum ./v2raya_bin | awk -F ' ' '{print$1}')
-    remote_v2raya_hash=$(cat ./v2raya-hash)
+    remote_v2raya_hash=$(cat ./v2raya_hash)
     if [ "$local_v2raya_hash" != "$remote_v2raya_hash" ]; then
         echo "v2rayA SHA256 mismatch!"
         echo "Expected: $remote_v2raya_hash"
         echo "Actual: $local_v2raya_hash"
         echo "Check your Internet and try again!"
-        rm ./v2raya-bin ./v2raya-hash
+        rm ./v2raya-bin ./v2raya_hash
         exit 1
     fi
 }
@@ -174,18 +180,18 @@ download_v2ray(){
         echo "${RED}""Download v2ray core failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
-    if ! curl -H "Cache-Control: no-cache" -sL "$v2ray_hash_url" --output ./v2ray-hash; then
+    if ! curl -H "Cache-Control: no-cache" -sL "$v2ray_hash_url" --output ./v2ray_hash; then
         echo "${RED}""Download v2ray core hash failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
     local_v2ray_hash=$(sha256sum ./v2ray.zip | awk -F ' ' '{print$1}')
-    remote_v2ray_hash=$(cat ./v2ray-hash | awk -F '= ' '/256=/ {print $2}')
+    remote_v2ray_hash=$(awk -F '= ' '/256=/ {print $2}' < ./v2ray_hash )
     if [ "$local_v2ray_hash" != "$remote_v2ray_hash" ]; then
         echo "v2ray core SHA256 mismatch!"
         echo "Expected: $remote_v2ray_hash"
         echo "Actual: $local_v2ray_hash"
         echo "Check your Internet and try again!"
-        rm ./v2ray.zip ./v2ray-hash
+        rm ./v2ray.zip ./v2ray_hash
         exit 1
     fi
 }
@@ -195,18 +201,18 @@ download_xray(){
         echo "${RED}""Download v2ray core failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
-    if ! curl -H "Cache-Control: no-cache" -sL "$xray_hash_url" --output ./xray-hash; then
+    if ! curl -H "Cache-Control: no-cache" -sL "$xray_hash_url" --output ./xray_hash; then
         echo "${RED}""Download v2ray core hash failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
     local_xray_hash=$(sha256sum ./xray.zip | awk -F ' ' '{print$1}')
-    remote_xray_hash=$(cat ./xray-hash | awk -F '= ' '/256=/ {print $2}')
+    remote_xray_hash=$(awk -F '= ' '/256=/ {print $2}' < ./xray_hash )
     if [ "$local_xray_hash" != "$remote_xray_hash" ]; then
         echo "xray core SHA256 mismatch!"
         echo "Expected: $remote_v2ray_hash"
         echo "Actual: $local_v2ray_hash"
         echo "Check your Internet and try again!"
-        rm ./xray.zip ./xray-hash
+        rm ./xray.zip ./xray_hash
         exit 1 
     fi
 }
@@ -215,26 +221,26 @@ download_xray(){
 ## v2rayA
 install_v2raya(){
     mv ./v2raya_bin "$install_path"/v2raya
-    chmod 755 "$install_path"/v2raya
-    rm ./v2raya-hash
+    chmod 755 "$install_path"v2raya
+    rm ./v2raya_hash
 }
 ## v2ray core
 install_v2ray(){
     unzip v2ray.zip -d ./v2ray/
     mv ./v2ray/v2ray "$install_path"
-    chmod 755 "$install_path"/v2ray
+    chmod 755 "$install_path"v2ray
     mkdir "$v2ray_share_path"
     mv ./v2ray/*dat "$v2ray_share_path"
-    rm -rf ./v2ray
+    rm -rf ./v2ray ./v2ray_hash
 }
 ## xray core
 install_xray(){
     unzip xray.zip -d ./xray/
     mv ./xray/xray "$install_path"
-    chmod 755 "$install_path"/xray
+    chmod 755 "$install_path"xray
     mkdir "$xray_share_path"
     mv ./xray/*dat "$xray_share_path"
-    rm -rf ./xray
+    rm -rf ./xray ./xray_hash
 }
 
 ## v2rayA service
@@ -324,11 +330,15 @@ if [ -f "$install_path"v2raya ]; then
 else
     v2raya_local_version="v0"
 fi
-if ! [ -n "$(echo "$v2raya_local_version" | grep "$v2raya_latest_tag")" ]; then
+if [ "$force_install" == 'yes' ]; then
+    get_v2raya_url
+    download_v2raya
+    we_are_in_installation=yes 
+elif ! [ -n "$(echo "$v2raya_local_version" | grep "$v2raya_latest_tag")" ]; then
 # if [ "$v2raya_local_version" != "$v2raya_latest_tag" ]; then
     get_v2raya_url
     download_v2raya
-    we_are_in_installation=yes
+    we_are_in_installation=yes 
 fi
 if [ "$need_install_v2ray" == 'yes' ]; then
     get_v2ray_url
@@ -341,18 +351,18 @@ fi
 if [ "$we_are_in_installation" == 'yes' ]; then
     stop_v2raya
     install_v2raya
-    if [ "$need_install_v2ray" == 'yes' ]; then
-        install_v2ray
-    fi
-    if [ "$need_install_v2ray" == 'yes' ]; then
-        install_xray
-    fi
     if [ -f '/usr/lib/systemd/systemd' ]; then
         create_systemd_service
     fi
     if [ -f '/sbin/openrc-run' ] || [ -f '/usr/sbin/openrc-run' ]; then
         create_open_rc_service
     fi
-    start_v2raya
 fi
+if [ "$need_install_v2ray" == 'yes' ]; then
+    install_v2ray
+fi
+if [ "$need_install_xray" == 'yes' ]; then
+    install_xray
+fi
+start_v2raya
 cd "$current_path" || exit

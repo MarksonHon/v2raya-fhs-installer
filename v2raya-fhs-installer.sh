@@ -146,7 +146,7 @@ get_xray_url(){
 ## v2rayA
 download_v2raya(){
     echo "${GREEN}""Downloading v2rayA...""${RESET}"
-    if ! curl --progress-bar -L "$v2raya_download_url" --output ./v2raya; then
+    if ! curl --progress-bar -L "$v2raya_download_url" --output ./v2raya_bin; then
         echo "${RED}""Download v2rayA failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
@@ -154,13 +154,14 @@ download_v2raya(){
         echo "${RED}""Download v2rayA hash failed! Check your Internet and try again!""${RESET}"
         exit 1
     fi
-    local_v2raya_hash=$(sha256sum ./v2raya | awk -F ' ' '{print$1}')
+    local_v2raya_hash=$(sha256sum ./v2raya_bin | awk -F ' ' '{print$1}')
     remote_v2raya_hash=$(cat ./v2raya-hash)
     if [ "$local_v2raya_hash" != "$remote_v2raya_hash" ]; then
         echo "v2rayA SHA256 mismatch!"
         echo "Expected: $remote_v2raya_hash"
         echo "Actual: $local_v2raya_hash"
         echo "Check your Internet and try again!"
+        rm ./v2raya-bin ./v2raya-hash
         exit 1
     fi
 }
@@ -182,6 +183,7 @@ download_v2ray(){
         echo "Expected: $remote_v2ray_hash"
         echo "Actual: $local_v2ray_hash"
         echo "Check your Internet and try again!"
+        rm ./v2ray.zip ./v2ray-hash
         exit 1
     fi
 }
@@ -202,14 +204,15 @@ download_xray(){
         echo "Expected: $remote_v2ray_hash"
         echo "Actual: $local_v2ray_hash"
         echo "Check your Internet and try again!"
-        exit 1
+        rm ./xray.zip ./xray-hash
+        exit 1 
     fi
 }
 
 ## Installation
 ## v2rayA
 install_v2raya(){
-    mv ./v2raya "$install_path"
+    mv ./v2raya_bin "$install_path"/v2raya
     chmod 755 "$install_path"/v2raya
     rm ./v2raya-hash
 }

@@ -317,7 +317,7 @@ start_v2raya(){
 current_path=$(pwd)
 cd /tmp/ || exit
 if [ -f "$install_path"/v2raya ]; then
-    v2raya_local_version=$("$install_path"/v2raya --version)
+    v2raya_local_version=$("$install_path"v2raya --version)
 else
     v2raya_local_version="v0"
 fi

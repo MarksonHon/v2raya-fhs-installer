@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 ## Color
 if command -v tput > /dev/null 2>&1; then
     RED=$(tput setaf 1)
@@ -318,11 +320,12 @@ start_v2raya(){
 current_path=$(pwd)
 cd /tmp/ || exit
 if [ -f "$install_path"v2raya ]; then
-    v2raya_local_version=v$("$install_path"v2raya --version)
+    v2raya_local_version=$("$install_path"v2raya --version)
 else
     v2raya_local_version="v0"
 fi
-if [ "$v2raya_local_version" != "$v2raya_latest_tag" ]; then
+if ! [ -n "$(echo "$v2raya_local_version" | grep "$v2raya_latest_tag")" ]; then
+# if [ "$v2raya_local_version" != "$v2raya_latest_tag" ]; then
     get_v2raya_url
     download_v2raya
     we_are_in_installation=yes

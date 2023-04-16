@@ -20,7 +20,7 @@ for tool_need in curl unzip jq; do
         elif command -v yum > /dev/null  2>&1; then
         yum install $tool_need -y
         elif command -v zypper > /dev/null 2>&1; then
-        zypper install --non-interactive $tool_need
+        zypper --non-interactive install $tool_need
         elif command -v pacman > /dev/null 2>&1; then
         pacman -S $tool_need --noconfirm
         elif command -v apk > /dev/null 2>&1; then
@@ -82,10 +82,10 @@ if [ "$1" != '--force' ] && [ "$1" != '--use-mirror' ] && [ "$1" != '--with-v2ra
     echo "--use-mirror     use v2rayA's mirror server to download (no xray core support yet)"
     echo "--with-v2ray     install v2ray core after installing v2rayA"
     echo "--with-xray      install xray core after installing v2rayA"
-    echo "--force          forcw install v2rayA even it has been installed"
+    echo "--force          force install v2rayA even it has been installed"
     exit 1
 fi
-while [ $# != 0 ] ; do 
+while [ $# != 0 ] ; do
     if [ "$1" == '--use-mirror' ]; then
         use_mirror='yes'
     fi
@@ -98,7 +98,7 @@ while [ $# != 0 ] ; do
     if [ "$1" == '--force' ]; then
         force_install='yes'
     fi
-    shift 
+    shift
 done
 
 ## Installation path
@@ -220,16 +220,18 @@ download_xray(){
 ## Installation
 ## v2rayA
 install_v2raya(){
-    mv ./v2raya_bin "$install_path"/v2raya
+    cp ./v2raya_bin "$install_path"v2raya
     chmod 755 "$install_path"v2raya
-    rm ./v2raya_hash
+    rm ./v2raya_hash ./v2raya_bin
 }
 ## v2ray core
 install_v2ray(){
     unzip v2ray.zip -d ./v2ray/
     mv ./v2ray/v2ray "$install_path"
     chmod 755 "$install_path"v2ray
-    mkdir "$v2ray_share_path"
+    if [ ! -d "$v2ray_share_path" ];then
+        mkdir "$v2ray_share_path"
+    fi
     mv ./v2ray/*dat "$v2ray_share_path"
     rm -rf ./v2ray ./v2ray_hash
 }
@@ -238,7 +240,9 @@ install_xray(){
     unzip xray.zip -d ./xray/
     mv ./xray/xray "$install_path"
     chmod 755 "$install_path"xray
-    mkdir "$xray_share_path"
+    if [ ! -d "$xray_share_path" ];then
+        mkdir "$xray_share_path"
+    fi
     mv ./xray/*dat "$xray_share_path"
     rm -rf ./xray ./xray_hash
 }
@@ -323,22 +327,28 @@ start_v2raya(){
 }
 
 ## Main
+## Work in tmp dir
 current_path=$(pwd)
-cd /tmp/ || exit
+cd /tmp/ || return 1
+## 
 if [ -f "$install_path"v2raya ]; then
     v2raya_local_version=$("$install_path"v2raya --version)
 else
     v2raya_local_version="v0"
 fi
+get_v2raya_url
+version_check=$(echo "$v2raya_local_version" | grep "$v2raya_latest_tag")
 if [ "$force_install" == 'yes' ]; then
     get_v2raya_url
     download_v2raya
     we_are_in_installation=yes 
-elif ! [ -n "$(echo "$v2raya_local_version" | grep "$v2raya_latest_tag")" ]; then
-# if [ "$v2raya_local_version" != "$v2raya_latest_tag" ]; then
+elif [ -z "$version_check" ]; then
     get_v2raya_url
     download_v2raya
-    we_are_in_installation=yes 
+    we_are_in_installation=yes
+else
+    echo "Latest version $v2raya_latest_tag installed"
+    exit
 fi
 if [ "$need_install_v2ray" == 'yes' ]; then
     get_v2ray_url
@@ -353,9 +363,14 @@ if [ "$we_are_in_installation" == 'yes' ]; then
     install_v2raya
     if [ -f '/usr/lib/systemd/systemd' ]; then
         create_systemd_service
-    fi
-    if [ -f '/sbin/openrc-run' ] || [ -f '/usr/sbin/openrc-run' ]; then
+        echo "${YELLOW}""If you want to start v2rayA at system startup, please run:""${RESET}"
+        echo "${YELLOW}""systemctl enable v2raya""${RESET}"
+    elif [ -f '/sbin/openrc-run' ] || [ -f '/usr/sbin/openrc-run' ]; then
         create_open_rc_service
+        echo "${YELLOW}""If you want to start v2rayA at system startup, please run:""${RESET}"
+        echo "${YELLOW}""rc-update add v2raya""${RESET}"
+    else
+        echo "${YELLOW}""No services file/script will be installed, you might need write a service config yourself after installation.""${RESET}"
     fi
 fi
 if [ "$need_install_v2ray" == 'yes' ]; then

@@ -13,6 +13,12 @@ If you need download from mirror:
 sudo bash -c "$(curl -sL -H "Cache-Control: no-cache" https://github.com/MarksonHon/v2raya-fhs-installer/raw/main/v2raya-fhs-installer.sh)" @ --use-mirror
 ```
 
+Use `--with-v2ray` to install v2ray core, or `--with-xray` to install xray core:
+
+```bash
+sudo bash -c "$(curl -sL -H "Cache-Control: no-cache" https://github.com/MarksonHon/v2raya-fhs-installer/raw/main/v2raya-fhs-installer.sh)" @ --with-v2ray
+```
+
 If you want to remove v2rayA:
 
 ```bash

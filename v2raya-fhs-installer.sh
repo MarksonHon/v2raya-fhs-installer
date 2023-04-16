@@ -331,7 +331,7 @@ start_v2raya(){
 current_path=$(pwd)
 cd /tmp/ || return 1
 ## Force install progess
-if [ "$force_install" == 'yes' ]; then
+force_installation(){
     if [ "$need_install_v2ray" == 'yes' ]; then
         get_v2ray_url
         download_v2ray
@@ -343,6 +343,7 @@ if [ "$force_install" == 'yes' ]; then
     get_v2raya_url
     download_v2raya
     stop_v2raya
+
     if [ "$need_install_v2ray" == 'yes' ]; then
         install_v2ray
     fi
@@ -350,72 +351,91 @@ if [ "$force_install" == 'yes' ]; then
         install_xray
     fi   
     install_v2raya
-    start_v2raya
-fi
-## Normal install progress
-if [ -f "$install_path"v2raya ]; then
-    current_v2raya_version=$("$install_path"v2raya --version)
-else
-    current_v2raya_version='0'
-fi
-if [ -f "$install_path"v2ray ]; then
-    current_v2ray_version=$("$install_path"v2ray version | awk 'NR==1' | awk '{print $2}' )
-else
-    current_v2ray_version='0'
-fi
-if [ -f "$install_path"xray ]; then
-    current_xray_version=$("$install_path"xray version | awk 'NR==1' | awk '{print $2}' )
-else
-    current_xray_version='0'
-fi
-if [ "$need_install_v2ray" == 'yes' ]; then
-    get_v2ray_url
-    check_v2ray_version=$(echo "$v2ray_latest_tag" | grep "$current_v2ray_version")
-    if [ -z "$check_v2ray_version" ]; then
-        download_v2ray
-        continue_install_v2ray='1'
-    else
-        echo "v2ray core has been the latest version $v2ray_latest_tag"
-    fi
-fi
-if [ "$need_install_xray" == 'yes' ]; then
-    get_xray_url
-    check_xray_version=$(echo "$xray_latest_tag" | grep "$current_xray_version")
-    if [ -z "$check_xray_version" ]; then
-        download_xray
-        continue_install_xray='1'
-    else
-        echo "xray core has been the latest version $xray_latest_tag"
-    fi
-fi
-get_v2raya_url
-check_v2raya_version=$(echo "$v2raya_latest_tag" | grep "$current_v2raya_version")
-if [ -z "$check_v2raya_version" ]; then
-    download_v2raya
-    update_service='1'
-else
-    echo "v2rayA has been the latest version $v2raya_latest_tag"
-fi
-stop_v2raya
-if [ "$update_service" == '1' ]; then
-    install_v2raya
     if [ -f '/usr/lib/systemd/systemd' ]; then
         create_systemd_service
         echo "${YELLOW}""If you want to start v2rayA at system startup, please run:""${RESET}"
         echo "${YELLOW}""systemctl enable v2raya""${RESET}"
-    elif [ -f '/sbin/openrc-run' ] || [ -f '/usr/sbin/openrc-run' ]; then
+        elif [ -f '/sbin/openrc-run' ] || [ -f '/usr/sbin/openrc-run' ]; then
         create_open_rc_service
         echo "${YELLOW}""If you want to start v2rayA at system startup, please run:""${RESET}"
         echo "${YELLOW}""rc-update add v2raya""${RESET}"
     else
         echo "${YELLOW}""No services file/script will be installed, you might need write a service config yourself after installation.""${RESET}"
     fi
+    start_v2raya
+}
+## Normal install progress
+normal_installation(){
+    if [ -f "$install_path"v2raya ]; then
+        current_v2raya_version=$("$install_path"v2raya --version)
+    else
+        current_v2raya_version='0'
+    fi
+    if [ -f "$install_path"v2ray ]; then
+        current_v2ray_version=$("$install_path"v2ray version | awk 'NR==1' | awk '{print $2}' )
+    else
+        current_v2ray_version='0'
+    fi
+    if [ -f "$install_path"xray ]; then
+        current_xray_version=$("$install_path"xray version | awk 'NR==1' | awk '{print $2}' )
+    else
+        current_xray_version='0'
+    fi
+    if [ "$need_install_v2ray" == 'yes' ]; then
+        get_v2ray_url
+        check_v2ray_version=$(echo "$v2ray_latest_tag" | grep "$current_v2ray_version")
+        if [ "$current_v2ray_version" == '0' ] || [ -z "$check_v2ray_version" ]; then
+            download_v2ray
+            continue_install_v2ray='1'
+        else
+            echo "v2ray core has been the latest version $v2ray_latest_tag"
+        fi
+    fi
+    if [ "$need_install_xray" == 'yes' ]; then
+        get_xray_url
+        check_xray_version=$(echo "$xray_latest_tag" | grep "$current_xray_version")
+        if [ "$current_xray_version" == '0' ] || [ -z "$check_xray_version" ]; then
+            download_xray
+            continue_install_xray='1'
+        else
+            echo "xray core has been the latest version $xray_latest_tag"
+        fi
+    fi
+    get_v2raya_url
+    check_v2raya_version=$(echo "$v2raya_latest_tag" | grep "$current_v2raya_version")
+    if [ -z "$check_v2raya_version" ]; then
+        download_v2raya
+        update_service='1'
+    else
+        echo "v2rayA has been the latest version $v2raya_latest_tag"
+    fi
+    stop_v2raya
+    if [ "$update_service" == '1' ]; then
+        install_v2raya
+        if [ -f '/usr/lib/systemd/systemd' ]; then
+            create_systemd_service
+            echo "${YELLOW}""If you want to start v2rayA at system startup, please run:""${RESET}"
+            echo "${YELLOW}""systemctl enable v2raya""${RESET}"
+        elif [ -f '/sbin/openrc-run' ] || [ -f '/usr/sbin/openrc-run' ]; then
+            create_open_rc_service
+            echo "${YELLOW}""If you want to start v2rayA at system startup, please run:""${RESET}"
+            echo "${YELLOW}""rc-update add v2raya""${RESET}"
+        else
+            echo "${YELLOW}""No services file/script will be installed, you might need write a service config yourself after installation.""${RESET}"
+        fi
+    fi
+    if [ "$continue_install_v2ray" == '1' ]; then
+        install_v2ray
+    fi
+    if [ "$continue_install_xray" == '1' ]; then
+        install_xray
+    fi
+    start_v2raya
+}
+## installation
+if [ "$force_install" == 'yes' ]; then
+    force_installation
+else
+    normal_installation
 fi
-if [ "$continue_install_v2ray" == '1' ]; then
-    install_v2ray
-fi
-if [ "$continue_install_xray" == '1' ]; then
-    install_xray
-fi
-start_v2raya
 cd "$current_path" || exit

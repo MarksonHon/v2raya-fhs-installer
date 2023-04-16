@@ -10,9 +10,7 @@ sudo bash -c "$(curl -sL -H "Cache-Control: no-cache" https://github.com/Markson
 If you need download from mirror:
 
 ```bash
-curl -LO -H "Cache-Control: no-cache" https://github.com/MarksonHon/v2raya-fhs-installer/raw/main/v2raya-fhs-installer.sh
-sudo chmod 755 v2raya-fhs-installer.sh
-sudo ./v2raya-fhs-installer.sh --use-mirror
+sudo bash -c "$(curl -sL -H "Cache-Control: no-cache" https://github.com/MarksonHon/v2raya-fhs-installer/raw/main/v2raya-fhs-installer.sh)" @ --use-mirror
 ```
 
 If you want to remove v2rayA:

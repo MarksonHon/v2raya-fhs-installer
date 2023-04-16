@@ -393,6 +393,8 @@ check_v2raya_version=$(echo "$v2raya_latest_tag" | grep "$current_v2raya_version
 if [ -z "$check_v2raya_version" ]; then
     download_v2raya
     update_service='1'
+else
+    echo "v2rayA has been the latest version $v2raya_latest_tag"
 fi
 stop_v2raya
 if [ "$update_service" == '1' ]; then

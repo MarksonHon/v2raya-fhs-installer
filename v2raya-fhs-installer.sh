@@ -77,7 +77,7 @@ if [ -f /system/build.prop ] || [ "$(uname -o)" == "Android" ]; then
 fi
 
 ## Check args
-if [ "$1" != '--force' ] && [ "$1" != '--use-mirror' ] && [ "$1" != '--with-v2ray' ] && [ "$1" != '--with-xray' ] && [ -n "$1" ];then
+if [ "$1" != '--force' ] && [ "$1" != '--use-mirror' ] && [ "$1" != '--with-v2ray' ] && [ "$1" != '--with-xray' ] && [ "$1" != '' ];then
     echo "${YELLOW}""Usage of $(pwd)/v2raya-fhs-installer.sh:""${RESET}"
     echo "--use-mirror     use v2rayA's mirror server to download (no xray core support yet)"
     echo "--with-v2ray     install v2ray core after installing v2rayA"
@@ -403,9 +403,10 @@ normal_installation(){
     fi
     get_v2raya_url
     check_v2raya_version=$(echo "$v2raya_latest_tag" | grep "$current_v2raya_version")
-    if [ -z "$check_v2raya_version" ]; then
+    if [ -z "$check_v2raya_version" ] || [ "$current_v2raya_version" == '0' ]; then
         download_v2raya
         update_service='1'
+       
     else
         echo "v2rayA has been the latest version $v2raya_latest_tag"
     fi

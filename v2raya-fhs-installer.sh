@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -x
 
 ## Color
 if command -v tput > /dev/null 2>&1; then
@@ -318,11 +318,13 @@ stop_v2raya(){
 ## Start v2rayA if has been stopped
 start_v2raya(){
     if [ "$v2raya_stopped" == "yes" ]; then
+        echo "${GREEN}Starting v2raya...${RESET}"
         if [ -f /etc/systemd/system/v2raya.service ]; then
             systemctl start v2raya
         elif [ -f /etc/init.d/v2raya ]; then
             /etc/init.d/v2raya start
         fi
+        echo "${GREEN}Started v2rayA${RESET}"
     fi
 }
 
@@ -343,7 +345,6 @@ force_installation(){
     get_v2raya_url
     download_v2raya
     stop_v2raya
-
     if [ "$need_install_v2ray" == 'yes' ]; then
         install_v2ray
     fi

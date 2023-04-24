@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+# set -x
 
 ## Color
 if command -v tput > /dev/null 2>&1; then
@@ -197,6 +197,7 @@ download_v2ray(){
 }
 ## xray core
 download_xray(){
+    echo "${GREEN}""Downloading xray core...""${RESET}"
     if ! curl -H "Cache-Control: no-cache" --progress-bar -L "$xray_download_url" --output ./xray.zip; then
         echo "${RED}""Download v2ray core failed! Check your Internet and try again!""${RESET}"
         exit 1
@@ -226,7 +227,8 @@ install_v2raya(){
 }
 ## v2ray core
 install_v2ray(){
-    unzip v2ray.zip -d ./v2ray/
+    echo "${GREEN}""unzip v2ray core zip file...""${RESET}"
+    unzip v2ray.zip -d ./v2ray/ >> /dev/null
     mv ./v2ray/v2ray "$install_path"
     chmod 755 "$install_path"v2ray
     if [ ! -d "$v2ray_share_path" ];then
@@ -237,7 +239,8 @@ install_v2ray(){
 }
 ## xray core
 install_xray(){
-    unzip xray.zip -d ./xray/
+    echo "${GREEN}""unzip xray core zip file...""${RESET}"
+    unzip xray.zip -d ./xray/ >> /dev/null
     mv ./xray/xray "$install_path"
     chmod 755 "$install_path"xray
     if [ ! -d "$xray_share_path" ];then

@@ -266,7 +266,7 @@ Type=simple
 User=root
 LimitNPROC=500
 LimitNOFILE=1000000
-ExecStart=${install_path}/v2raya
+ExecStart=${install_path}v2raya
 Restart=on-failure
 
 [Install]
@@ -279,7 +279,7 @@ create_open_rc_service(){
    echo "#!/sbin/openrc-run
 name=\"v2rayA\"
 description=\"A Linux web GUI client of Project V which supports V2Ray, Xray, SS, SSR, Trojan and Pingtunnel\"
-command=\"/usr/local/bin/v2raya\"
+command=\"${install_path}v2raya\"
 command_args=\"--log-file /var/log/v2raya/access.log\"
 error_log=\"/var/log/v2raya/error.log\"
 pidfile=\"/run/\${RC_SVCNAME}.pid\"

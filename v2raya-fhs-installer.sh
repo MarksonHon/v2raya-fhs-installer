@@ -302,6 +302,7 @@ start_pre() {
    fi
 }" > '/etc/init.d/v2raya'
     echo "OpenRC service script has installed to /etc/init.d/v2raya"
+    chmod +x /etc/init.d/v2raya
 }
 ## Stop service while in installation
 stop_v2raya(){
